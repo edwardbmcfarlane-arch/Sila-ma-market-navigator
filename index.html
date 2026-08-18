@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sila Services — M&A Market Navigator</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230A1826'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle' fill='%23E8C468'%3EM%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+// ============================================================
+// DATA BLOCK — plain JS, edit here for monthly updates
+// ============================================================
+
+const KB_LAST_UPDATED = "August 2026";
+
+const DISCLAIMER = "Data status is mixed: states marked ✓ VERIFIED have licensing data researched against state licensing authorities (Aug 2026); all other state figures and all metro demographics remain directional SAMPLE data. Validate unverified figures against licensing boards, Census/ACS data, and internal deal data before using this to inform an actual acquisition decision.";
+
+// Licensing tiers, ranked as a proxy for "greenfield entry difficulty" —
+// higher moat = harder for a new competitor to stand up shop, which is
+// exactly the friction an acquisition lets Sila buy through.
+const MOAT_LABELS = {
+  1: "Minimal — easy greenfield entry",
+  2: "Low — modest barrier",
+  3: "Moderate — real but crossable barrier",
+  4: "High — meaningful moat",
+  5: "Very High — strong moat"
+};
+
+// [abbr, name, licensingModel, moat(1-5), incentiveExposure, rating, note]
+const STATE_ROWS = [
+["AL","Alabama","State-Only",3,"Low","Favorable","Single state board covers most trades; steady, low-drama regulatory climate."],
+["AK","Alaska","State-Only",3,"Low","Watch","Thin population base and logistics costs offset a workable licensing moat."],
+["AZ","Arizona","State-Only",3,"Moderate","Favorable","Fast-growing Sunbelt market; ROC licensing is a real but crossable barrier."],
+["AR","Arkansas","State-Only",2,"Low","Watch","Light regulatory structure; low moat, low urgency market."],
+["CA","California","State-Only (CSLB)",4,"High","Watch","Strict contractor licensing is a strong moat, but Title 24 electrification mandates create real system-mix volatility."],
+["CO","Colorado","State + County",3,"High","Watch","Front Range growth is attractive, but heat-pump rebate dependency is significant."],
+["CT","Connecticut","State + Municipal",5,"High","Watch","One of the strongest licensing moats in the country, paired with high New England incentive exposure."],
+["DE","Delaware","State-Only",3,"Moderate","Favorable","Small but stable market with a workable regulatory moat."],
+["FL","Florida","State-Only (strict exam)",4,"Low","Favorable","Large market, rigorous licensing exam, low incentive dependency — a strong combination."],
+["GA","Georgia","State-Only",3,"Moderate","Favorable","Atlanta-driven growth plus active data-center buildout in the metro."],
+["HI","Hawaii","State-Only",3,"Moderate","Watch","Island logistics premium works both for and against defensibility."],
+["ID","Idaho","State-Only",2,"Low","Favorable","Boise-area growth market; licensing moat is modest but demand trend is strong."],
+["IL","Illinois","State + Municipal (Chicago)",5,"Moderate","Favorable","Chicago's municipal licensing layer on top of state rules creates a very high moat in the metro core."],
+["IN","Indiana","State-Only",3,"Low","Favorable","Indianapolis data-center corridor emerging; licensing is moderate but manageable."],
+["IA","Iowa","State-Only",2,"Low","Watch","Low moat, low incentive volatility — a quiet, low-differentiation market."],
+["KS","Kansas","State-Only",2,"Low","Watch","Similar profile to Iowa — stable but not differentiated."],
+["KY","Kentucky","State-Only",3,"Low","Favorable","Manageable moat, logistics-driven industrial growth in some metros."],
+["LA","Louisiana","State + Municipal",4,"Low","Favorable","Parish-level overlays on top of state licensing raise the effective moat."],
+["ME","Maine","State-Only",3,"High","Watch","Efficiency Maine heat-pump incentives have driven a sharp ductless/mini-split share increase — see Portland metro."],
+["MD","Maryland","State + County",4,"High","Watch","County-level licensing adds real friction, but incentive dependency is elevated."],
+["MA","Massachusetts","State + Municipal",5,"High","Watch","Mass Save incentive cycles are a known driver of system-mix swings; licensing moat is very strong."],
+["MI","Michigan","State-Only",3,"Moderate","Favorable","Balanced profile; moderate moat and moderate incentive exposure."],
+["MN","Minnesota","State-Only",3,"Moderate","Favorable","Stable Twin Cities market with a workable regulatory barrier."],
+["MS","Mississippi","State-Only",2,"Low","Watch","Low moat and limited near-term demand catalysts."],
+["MO","Missouri","State + Municipal (KC/STL)",3,"Low","Favorable","Kansas City and St. Louis municipal licensing add a layer state rules alone don't provide."],
+["MT","Montana","State-Only",2,"Low","Watch","Thin population, limited near-term catalysts."],
+["NE","Nebraska","State-Only",2,"Low","Watch","Similar low-differentiation profile to neighboring plains states."],
+["NV","Nevada","State-Only (strict)",4,"Moderate","Favorable","Rigorous state contractor board exam process creates a real moat in a growing market."],
+["NH","New Hampshire","Minimal / Local",2,"High","Watch","Low licensing moat combined with high regional incentive exposure — a double risk flag, similar dynamic to Maine."],
+["NJ","New Jersey","State + Municipal",5,"High","Watch","Very strong licensing moat, but high incentive exposure and dense competitive landscape."],
+["NM","New Mexico","State-Only",2,"Low","Watch","Low moat, modest demand growth."],
+["NY","New York","State + Municipal (NYC)","5","High","Watch","NYC's municipal licensing layer is one of the strongest moats nationally; incentive exposure is elevated statewide."],
+["NC","North Carolina","State-Only",3,"Moderate","Favorable","Charlotte and Raleigh growth corridors with a workable regulatory moat."],
+["ND","North Dakota","State-Only",2,"Low","Watch","Thin population base."],
+["OH","Ohio","State + Municipal",4,"Moderate","Favorable","Municipal licensing overlays plus the Columbus-area data-center boom make this a standout combination."],
+["OK","Oklahoma","State-Only",2,"Low","Favorable","Manageable barrier, steady demand."],
+["OR","Oregon","State + Municipal",4,"High","Watch","Strong moat offset by high incentive dependency and electrification mandates."],
+["PA","Pennsylvania","State + Municipal (patchwork)",4,"Moderate","Favorable","Fragmented municipal licensing patchwork is a genuine moat once you're inside it via acquisition."],
+["RI","Rhode Island","State + Municipal",4,"High","Watch","Small market with New England-level incentive exposure."],
+["SC","South Carolina","State-Only",3,"Moderate","Favorable","Greenville-area manufacturing and data-center announcements support demand."],
+["SD","South Dakota","State-Only",2,"Low","Watch","Low differentiation market."],
+["TN","Tennessee","State-Only",3,"Low","Favorable","Nashville growth corridor, low incentive dependency."],
+["TX","Texas","Minimal / Local Only",1,"Low","Caution","No statewide HVAC contractor license — the weakest moat in this dataset despite a very large market; expect easier greenfield competition."],
+["UT","Utah","State-Only",3,"Moderate","Favorable","Growing market with a manageable regulatory barrier."],
+["VT","Vermont","State-Only",2,"High","Watch","Low moat paired with high incentive exposure — flagged for the same reasons as NH and ME."],
+["VA","Virginia","State-Only",3,"Moderate","Favorable","Loudoun County's data-center buildout is a major demand and labor-market signal — see metro detail."],
+["WA","Washington","State + Municipal",4,"High","Watch","Strong moat, but aggressive electrification policy raises incentive-driven volatility."],
+["WV","West Virginia","State-Only",3,"Low","Watch","Manageable moat, limited growth catalysts."],
+["WI","Wisconsin","State-Only",3,"Moderate","Favorable","Balanced, steady market."],
+["WY","Wyoming","State-Only",1,"Low","Caution","Very thin population and a low-differentiation regulatory environment."]
+].map(r => ({abbr:r[0], name:r[1], licensing:r[2], moat:Number(r[3]), incentive:r[4], rating:r[5], note:r[6]}));
+
+// Example metros with illustrative demographic and labor-market data.
+// Chosen to span the patterns discussed: aging tract-housing stock,
+// data-center-driven labor competition, and New England incentive volatility.
+const METROS = [
+{ id:"charlotte", name:"Charlotte", state:"NC", population:"2.8M metro", income:"$72K", homeAge:22,
+  builderEra:"1995–2010 national-builder tract subdivisions ringing the metro core",
+  density:"Medium-High", competitiveDensity:"Medium (~24 multi-trade operators $5M+ revenue)",
+  adjacentIndustry:"Financial-services and logistics growth, with moderate data-center activity just south of the metro in Rock Hill/York Co., SC.",
+  laborDrain:"Low", marginOpp:"Medium", commercialTilt:35, tradeDiversification:2, consolidation:"Medium",
+  score:78, archetype:"1–2 location residential-heavy HVAC & Plumbing combo, $6–10M revenue, family-owned, 15+ years operating" },
+{ id:"raleigh", name:"Raleigh–Durham", state:"NC", population:"2.2M metro", income:"$78K", homeAge:19,
+  builderEra:"1998–2015 national-builder growth around Research Triangle Park",
+  density:"Medium-High", competitiveDensity:"Medium",
+  adjacentIndustry:"Research Triangle tech expansion plus a growing hyperscale data-center cluster (Apple campus, multiple announced facilities).",
+  laborDrain:"Medium-High", marginOpp:"High", commercialTilt:35, tradeDiversification:2, consolidation:"Medium",
+  score:81, archetype:"Residential/light-commercial HVAC & Electrical combo positioned ahead of the Triangle's data-center labor squeeze" },
+{ id:"columbus", name:"Columbus", state:"OH", population:"2.1M metro", income:"$68K", homeAge:28,
+  builderEra:"1990s–2000s suburban tract housing now entering full-system replacement cycle",
+  density:"Medium", competitiveDensity:"Medium",
+  adjacentIndustry:"Intel's $28B fab plus a fast-growing hyperscale data-center corridor in New Albany/Licking Co. — the largest active buildout in the Midwest.",
+  laborDrain:"High — electricians and HVAC techs pulled into fab and data-center construction at 20–30% wage premiums",
+  marginOpp:"High — techs who stay in service/replacement face reduced competition as peers shift to construction",
+  commercialTilt:30, tradeDiversification:2, consolidation:"Medium",
+  score:85, archetype:"Single-location residential/light-commercial HVAC leader with succession-planning owner, $8–15M revenue" },
+{ id:"phoenix", name:"Phoenix", state:"AZ", population:"5.0M metro", income:"$74K", homeAge:18,
+  builderEra:"Rapid 2000s–2020s national-builder growth, still actively building",
+  density:"High", competitiveDensity:"High — several national roll-up platforms already active",
+  adjacentIndustry:"TSMC's $65B fab plus a major data-center buildout in Chandler/Mesa.",
+  laborDrain:"High", marginOpp:"Medium — labor drain benefit partly offset by heavy existing competition",
+  commercialTilt:40, tradeDiversification:3, consolidation:"Low — market largely already consolidated",
+  score:74, archetype:"Multi-location residential/commercial combo already competing against national platforms; entry likely requires a premium bid" },
+{ id:"loudoun", name:"Loudoun County / Ashburn", state:"VA", population:"450K county / 6.3M DC metro", income:"$145K (county)", homeAge:20,
+  builderEra:"1990s–2010s planned communities",
+  density:"High", competitiveDensity:"Medium",
+  adjacentIndustry:"The world's largest data-center market — 'Data Center Alley' — carrying more than 30% of global hyperscale capacity.",
+  laborDrain:"Very High — electrical and mechanical trades drawn into data-center construction en masse",
+  marginOpp:"High — service techs who remain in residential/light-commercial work are scarce and can price accordingly",
+  commercialTilt:45, tradeDiversification:2, consolidation:"Medium",
+  score:88, archetype:"Residential/light-commercial HVAC & Electrical combo with a stable retained tech base — retention track record matters more here than size" },
+{ id:"richmond", name:"Richmond", state:"VA", population:"1.3M metro", income:"$70K", homeAge:30,
+  builderEra:"Mixed vintage with strong 1990s suburban tract rings",
+  density:"Medium", competitiveDensity:"Medium",
+  adjacentIndustry:"Growing data-center spillover south from Northern Virginia along the I-95 corridor plus a stable state-government economy.",
+  laborDrain:"Medium", marginOpp:"Medium-High", commercialTilt:30, tradeDiversification:2, consolidation:"Medium",
+  score:74, archetype:"Densification play bridging Sila's NoVA and Roanoke positions along I-95/I-64" },
+{ id:"boise", name:"Boise", state:"ID", population:"800K metro", income:"$68K", homeAge:15,
+  builderEra:"New-construction wave 2015–present; early warranty work now aging into paid service",
+  density:"Low-Medium", competitiveDensity:"Low",
+  adjacentIndustry:"Micron's $15B semiconductor expansion plus broader tech-sector in-migration.",
+  laborDrain:"Medium", marginOpp:"Medium",
+  commercialTilt:25, tradeDiversification:1, consolidation:"High — fragmented, few multi-trade platforms yet",
+  score:71, archetype:"Single-trade HVAC operator positioned to add Plumbing/Electrical as the housing stock ages into service demand" },
+{ id:"greenville", name:"Greenville", state:"SC", population:"950K metro", income:"$62K", homeAge:20,
+  builderEra:"Manufacturing-driven growth with mixed housing vintage",
+  density:"Medium", competitiveDensity:"Low-Medium",
+  adjacentIndustry:"BMW, advanced manufacturing, and emerging data-center announcements along the I-85 corridor.",
+  laborDrain:"Medium", marginOpp:"Medium-High",
+  commercialTilt:30, tradeDiversification:2, consolidation:"High",
+  score:76, archetype:"2-location residential/commercial combo serving both tract-housing service calls and light-industrial accounts" },
+{ id:"atlanta", name:"Atlanta", state:"GA", population:"6.3M metro", income:"$71K", homeAge:24,
+  builderEra:"Extensive 1990s–2000s national-builder subdivisions — prime replacement-cycle housing stock",
+  density:"High", competitiveDensity:"High",
+  adjacentIndustry:"One of the largest data-center markets in the US, concentrated in Douglas, Fulton, and Coweta counties.",
+  laborDrain:"High", marginOpp:"Medium",
+  commercialTilt:35, tradeDiversification:3, consolidation:"Low — already a target-rich, well-picked-over metro",
+  score:80, archetype:"Multi-location full-trade platform; likely a bolt-on acquisition rather than a platform entry at this point" },
+{ id:"pittsburgh", name:"Pittsburgh", state:"PA", population:"2.3M metro", income:"$65K", homeAge:45,
+  builderEra:"Older, established housing stock — a full-system-replacement market rather than a tune-up market",
+  density:"Medium", competitiveDensity:"Medium",
+  adjacentIndustry:"Modest AI-compute and data-center investment; a slower-growth market overall.",
+  laborDrain:"Low", marginOpp:"Medium",
+  commercialTilt:30, tradeDiversification:2, consolidation:"Medium",
+  score:66, archetype:"Long-tenured single-location HVAC & Plumbing operator serving an aging housing stock with high replacement-ticket values" },
+{ id:"philadelphia", name:"Philadelphia", state:"PA", population:"6.2M metro", income:"$74K", homeAge:55,
+  builderEra:"Old rowhome and streetcar-suburb stock in the core; 1990s–2000s tract rings in Chester, Bucks, and Montgomery counties",
+  density:"High", competitiveDensity:"High — Sila's home market with deep existing brand coverage",
+  adjacentIndustry:"Eds-and-meds economy plus growing suburban data-center interest along the I-95/PA-Turnpike corridors.",
+  laborDrain:"Low-Medium", marginOpp:"Medium",
+  commercialTilt:35, tradeDiversification:3, consolidation:"Low — home turf; remaining deals are tuck-ins like Oxford Plumbing",
+  score:64, archetype:"Small tuck-in acquisitions filling county-level coverage gaps around existing brands" },
+{ id:"manchester", name:"Manchester", state:"NH", population:"420K metro", income:"$78K", homeAge:40,
+  builderEra:"Older New England housing stock",
+  density:"Medium", competitiveDensity:"Low",
+  adjacentIndustry:"Minimal adjacent industrial buildout in this metro.",
+  laborDrain:"Low", marginOpp:"Low",
+  commercialTilt:20, tradeDiversification:1, consolidation:"Medium",
+  incentiveFlag:"High exposure to NH/Mass Save-adjacent electrification incentives — mini-split/ductless share of new installs has grown sharply and is vulnerable to incentive rollback.",
+  score:58, archetype:"Illustrates the New England incentive-volatility pattern directly — underwrite as if a meaningful share of current-year revenue is incentive-dependent" },
+{ id:"boston", name:"Boston", state:"MA", population:"4.9M metro", income:"$94K", homeAge:60,
+  builderEra:"Very old triple-decker and colonial housing stock — high-ticket retrofit and replacement work",
+  density:"High", competitiveDensity:"High",
+  adjacentIndustry:"Eds-meds-biotech economy; lab buildout creates commercial mechanical demand.",
+  laborDrain:"Medium", marginOpp:"Medium",
+  commercialTilt:40, tradeDiversification:3, consolidation:"Low — existing Sila stronghold",
+  incentiveFlag:"Mass Save is the canonical incentive-cycle example — heat-pump conversion volume swings with program budgets and administration priorities.",
+  score:62, archetype:"Densification tuck-ins around the existing Boston Sila position; underwrite Mass Save dependency explicitly" },
+{ id:"hartford", name:"Hartford / New Haven", state:"CT", population:"2.0M combined metro", income:"$76K", homeAge:55,
+  builderEra:"Old New England housing stock with pockets of 1980s–90s suburbia",
+  density:"Medium-High", competitiveDensity:"Medium",
+  adjacentIndustry:"Insurance and defense (Electric Boat, Pratt & Whitney) anchor employment; modest data-center activity.",
+  laborDrain:"Low-Medium", marginOpp:"Medium",
+  commercialTilt:30, tradeDiversification:2, consolidation:"Medium",
+  incentiveFlag:"Energize CT incentive programs drive meaningful heat-pump conversion volume — same volatility family as Mass Save.",
+  score:63, archetype:"Densification around existing CT brands; very high licensing moat protects incumbents" },
+{ id:"burlington", name:"Burlington", state:"VT", population:"230K metro", income:"$75K", homeAge:50,
+  builderEra:"Old housing stock, heavy fuel-oil conversion activity",
+  density:"Low", competitiveDensity:"Low",
+  adjacentIndustry:"Minimal industrial buildout.",
+  laborDrain:"Low", marginOpp:"Low",
+  commercialTilt:15, tradeDiversification:1, consolidation:"Medium",
+  incentiveFlag:"Efficiency Vermont heat-pump incentives mirror the Maine pattern — high ductless share, high policy sensitivity.",
+  score:54, archetype:"Small-market tuck-in only; incentive dependency is the dominant underwriting question" },
+{ id:"portlandme", name:"Portland", state:"ME", population:"550K metro", income:"$70K", homeAge:50,
+  builderEra:"Old housing stock with heavy oil-to-heat-pump conversion activity",
+  density:"Low-Medium", competitiveDensity:"Low",
+  adjacentIndustry:"No significant adjacent industrial buildout.",
+  laborDrain:"Low", marginOpp:"Low",
+  commercialTilt:15, tradeDiversification:1, consolidation:"Medium",
+  incentiveFlag:"Extremely high exposure to Efficiency Maine heat-pump incentives; ductless mini-split share of the market has surged and would contract sharply if incentives lapse.",
+  score:55, archetype:"Second New England volatility example — pair with Manchester, NH when sizing incentive-dependency exposure across a New England add-on strategy" },
+{ id:"northjersey", name:"North / Central NJ", state:"NJ", population:"6.0M+ region", income:"$92K", homeAge:50,
+  builderEra:"Dense postwar suburbia — huge installed base of aging systems",
+  density:"Very High", competitiveDensity:"High",
+  adjacentIndustry:"Pharma and logistics anchors plus one of the East Coast's largest data-center concentrations in the Meadowlands/Secaucus area.",
+  laborDrain:"Medium", marginOpp:"Medium",
+  commercialTilt:35, tradeDiversification:2, consolidation:"Medium",
+  incentiveFlag:"NJ Clean Energy program incentives are material to heat-pump conversion volume.",
+  score:67, archetype:"Densification around existing NJ coverage; municipal licensing patchwork strongly favors incumbents" },
+{ id:"hudsonvalley", name:"Hudson Valley", state:"NY", population:"2.3M region", income:"$85K", homeAge:50,
+  builderEra:"Mixed old housing with NYC-exurb growth pockets",
+  density:"Medium", competitiveDensity:"Medium",
+  adjacentIndustry:"NYC-commuter economy plus chip-fab spillover from the Capital Region (GlobalFoundries).",
+  laborDrain:"Medium", marginOpp:"Medium",
+  commercialTilt:25, tradeDiversification:2, consolidation:"Medium",
+  score:66, archetype:"Bridges existing Westchester and upstate positions; municipal licensing raises incumbency value" },
+{ id:"buffalo", name:"Buffalo", state:"NY", population:"1.1M metro", income:"$62K", homeAge:60,
+  builderEra:"Very old housing stock — high replacement tickets, low new-construction exposure",
+  density:"Medium", competitiveDensity:"Low-Medium",
+  adjacentIndustry:"Modest; some advanced-manufacturing reshoring.",
+  laborDrain:"Low", marginOpp:"Medium",
+  commercialTilt:25, tradeDiversification:2, consolidation:"Medium",
+  score:61, archetype:"Densification around the existing T-Mark position in Western New York" },
+{ id:"wilmington", name:"Wilmington", state:"DE", population:"590K metro", income:"$75K", homeAge:40,
+  builderEra:"Postwar suburbia plus 1990s–2000s New Castle County growth",
+  density:"Medium", competitiveDensity:"Low-Medium",
+  adjacentIndustry:"Banking/legal economy; adjacent to Philadelphia market dynamics.",
+  laborDrain:"Low", marginOpp:"Medium",
+  commercialTilt:30, tradeDiversification:2, consolidation:"Medium",
+  score:63, archetype:"Effectively part of the greater Philadelphia densification strategy" },
+{ id:"baltimore", name:"Baltimore", state:"MD", population:"2.8M metro", income:"$77K", homeAge:45,
+  builderEra:"Old rowhome core with extensive 1980s–2000s suburban counties",
+  density:"High", competitiveDensity:"Medium-High",
+  adjacentIndustry:"Port/logistics plus federal-agency employment; data-center growth pushing up from NoVA into Frederick County.",
+  laborDrain:"Medium", marginOpp:"Medium",
+  commercialTilt:30, tradeDiversification:2, consolidation:"Medium",
+  score:68, archetype:"Bridges the existing MD position and the NoVA labor-squeeze opportunity" },
+{ id:"chicago", name:"Chicago", state:"IL", population:"9.4M metro", income:"$75K", homeAge:50,
+  builderEra:"Vast bungalow-belt and postwar suburban stock — enormous installed base",
+  density:"Very High", competitiveDensity:"High",
+  adjacentIndustry:"Diversified economy with a growing western-suburbs data-center cluster (Elk Grove Village is one of the largest US markets).",
+  laborDrain:"Medium", marginOpp:"Medium",
+  commercialTilt:35, tradeDiversification:3, consolidation:"Medium",
+  score:70, archetype:"Densification around the Ahrens & Condill / Tangney positions; Chicago municipal licensing strongly protects incumbents" },
+{ id:"milwaukee", name:"Milwaukee", state:"WI", population:"1.6M metro", income:"$66K", homeAge:45,
+  builderEra:"Older urban core with 1990s suburban rings (New Berlin corridor)",
+  density:"Medium", competitiveDensity:"Medium",
+  adjacentIndustry:"Microsoft's major Mount Pleasant data-center campus (on the former Foxconn site) is a significant new labor-demand signal.",
+  laborDrain:"Medium-High", marginOpp:"Medium-High",
+  commercialTilt:30, tradeDiversification:2, consolidation:"Medium",
+  score:72, archetype:"Densification around the New Berlin position as the Mount Pleasant buildout tightens trades labor" },
+{ id:"detroit", name:"Detroit", state:"MI", population:"4.3M metro", income:"$65K", homeAge:50,
+  builderEra:"Vast postwar suburban stock — large installed replacement base",
+  density:"High", competitiveDensity:"Medium-High",
+  adjacentIndustry:"Auto/EV plant retooling plus emerging data-center interest.",
+  laborDrain:"Medium", marginOpp:"Medium",
+  commercialTilt:30, tradeDiversification:2, consolidation:"Medium",
+  score:66, archetype:"Densification in existing Michigan footprint; replacement-cycle economics dominate" },
+{ id:"grandrapids", name:"Grand Rapids", state:"MI", population:"1.1M metro", income:"$68K", homeAge:30,
+  builderEra:"Steady 1990s–2010s growth market with healthy tract-housing rings",
+  density:"Medium", competitiveDensity:"Low-Medium",
+  adjacentIndustry:"Furniture/advanced manufacturing base plus West Michigan population growth.",
+  laborDrain:"Low-Medium", marginOpp:"Medium-High",
+  commercialTilt:25, tradeDiversification:2, consolidation:"High",
+  score:72, archetype:"West Michigan platform target in a fragmented, growing market — a fresh position rather than a Detroit tuck-in" },
+{ id:"indianapolis", name:"Indianapolis", state:"IN", population:"2.1M metro", income:"$66K", homeAge:26,
+  builderEra:"1990s–2000s tract housing ringing the metro",
+  density:"Medium", competitiveDensity:"Medium",
+  adjacentIndustry:"Emerging data-center corridor (Google, AWS announcements) plus a large logistics-hub economy.",
+  laborDrain:"Medium", marginOpp:"Medium-High",
+  commercialTilt:30, tradeDiversification:2, consolidation:"Medium",
+  score:75, archetype:"2-location residential/commercial combo well-positioned ahead of the data-center buildout maturing" },
+{ id:"nashville", name:"Nashville", state:"TN", population:"2.1M metro", income:"$70K", homeAge:20,
+  builderEra:"Explosive 2000s–2020s national-builder growth",
+  density:"Medium-High", competitiveDensity:"Medium-High",
+  adjacentIndustry:"Corporate relocations (Oracle campus) plus data-center growth in the surrounding counties.",
+  laborDrain:"Medium-High", marginOpp:"Medium",
+  commercialTilt:30, tradeDiversification:2, consolidation:"Medium",
+  score:79, archetype:"Contiguous-expansion platform entry — TN borders both VA and GA positions, no state HVAC income tax friction, strong in-migration" },
+{ id:"louisville", name:"Louisville", state:"KY", population:"1.3M metro", income:"$62K", homeAge:35,
+  builderEra:"Mixed vintage with steady 1990s suburban rings",
+  density:"Medium", competitiveDensity:"Low-Medium",
+  adjacentIndustry:"UPS Worldport logistics anchor plus Ford EV investment in the region.",
+  laborDrain:"Medium", marginOpp:"Medium",
+  commercialTilt:30, tradeDiversification:2, consolidation:"High",
+  score:69, archetype:"Contiguous expansion off the Ohio position; fragmented market with room for a platform" },
+{ id:"minneapolis", name:"Minneapolis–St. Paul", state:"MN", population:"3.7M metro", income:"$80K", homeAge:40,
+  builderEra:"Large postwar and 1980s–90s suburban stock; harsh-climate replacement economics",
+  density:"Medium-High", competitiveDensity:"Medium-High",
+  adjacentIndustry:"Corporate HQ economy (Target, UnitedHealth) plus Meta's Rosemount data-center build.",
+  laborDrain:"Medium", marginOpp:"Medium",
+  commercialTilt:30, tradeDiversification:2, consolidation:"Medium",
+  score:73, archetype:"Contiguous expansion off Wisconsin; heating-dominant revenue rhythm similar to existing northern markets" },
+{ id:"kansascity", name:"Kansas City", state:"MO", population:"2.2M metro", income:"$68K", homeAge:30,
+  builderEra:"1990s–2000s suburban tract rings on both state sides",
+  density:"Medium", competitiveDensity:"Medium",
+  adjacentIndustry:"Meta and Google data-center builds plus a Panasonic battery plant in De Soto, KS.",
+  laborDrain:"Medium-High", marginOpp:"Medium-High",
+  commercialTilt:30, tradeDiversification:2, consolidation:"Medium",
+  score:70, archetype:"Two-state metro — KC municipal licensing on the MO side adds incumbent protection; labor squeeze from battery/data-center builds" },
+{ id:"denver", name:"Denver", state:"CO", population:"3.0M metro", income:"$85K", homeAge:28,
+  builderEra:"1990s–2010s Front Range tract growth",
+  density:"Medium-High", competitiveDensity:"High — active roll-up territory",
+  adjacentIndustry:"Aerospace and tech anchors; moderate data-center activity.",
+  laborDrain:"Medium", marginOpp:"Medium",
+  commercialTilt:30, tradeDiversification:2, consolidation:"Low-Medium",
+  incentiveFlag:"Colorado heat-pump tax credits and Xcel rebates are material to current conversion volume — moderate volatility exposure.",
+  score:72, archetype:"New-territory platform entry in a competitive roll-up market; would be an isolated regional position" },
+{ id:"tampa", name:"Tampa", state:"FL", population:"3.3M metro", income:"$67K", homeAge:25,
+  builderEra:"Waves of 1980s–2020s national-builder growth; cooling-dominant replacement cycle",
+  density:"Medium-High", competitiveDensity:"High — heavy PE roll-up activity statewide",
+  adjacentIndustry:"Population in-migration is the demand story more than any single industry.",
+  laborDrain:"Low-Medium", marginOpp:"Medium",
+  commercialTilt:30, tradeDiversification:2, consolidation:"Low — Florida is the most picked-over HVAC M&A market in the country",
+  score:77, archetype:"Contiguous expansion off Georgia; strong fundamentals but expect competitive processes and premium multiples" },
+{ id:"sanantonio", name:"San Antonio", state:"TX", population:"2.7M metro", income:"$63K", homeAge:22,
+  builderEra:"Fast-growing national-builder subdivisions",
+  density:"Medium-High", competitiveDensity:"Medium — low regulatory barrier means a more fragmented small-operator landscape",
+  adjacentIndustry:"Significant hyperscale data-center investment (Microsoft, Google) plus a large military/aerospace base economy.",
+  laborDrain:"Medium-High", marginOpp:"Medium",
+  commercialTilt:30, tradeDiversification:2, consolidation:"High",
+  score:69, archetype:"Good metro fundamentals despite Texas's statewide Caution flag — illustrates why state-level and metro-level signals can diverge" },
+{ id:"dallas", name:"Dallas–Fort Worth", state:"TX", population:"8.1M metro", income:"$75K", homeAge:22,
+  builderEra:"Enormous 1990s–2020s national-builder inventory",
+  density:"High", competitiveDensity:"Very High — every national platform is here",
+  adjacentIndustry:"Major corporate-relocation and data-center market with continuous buildout.",
+  laborDrain:"Medium-High", marginOpp:"Low-Medium",
+  commercialTilt:35, tradeDiversification:3, consolidation:"Low",
+  score:71, archetype:"Massive market but weakest-moat state and heaviest platform competition — a scale bet, not a moat bet" }
+];
+
+
+// ============================================================
+// VERIFIED STATE DATA — researched against licensing authorities
+// August 2026. States not listed here remain SAMPLE data.
+// ============================================================
+const VERIFIED_STATES = {
+TX: {
+  licensing: "State trade licenses (TDLR: HVAC/ACR + Electrical; TSBPE: Plumbing) — no GC license",
+  moat: 3, rating: "Watch",
+  note: "CORRECTED from earlier sample data: Texas has no statewide general contractor license, but HVAC/ACR and electrical require statewide TDLR licenses and plumbing requires TSBPE licensure. Critically, TDLR offers NO reciprocity with any state — out-of-state contractors face full application and examination. So the trade-level moat is real (roughly 4-6 weeks to license even for qualified applicants). The Watch rating reflects extreme platform competition in the major metros rather than regulatory weakness.",
+  authority: "TDLR (HVAC, Electrical) / TSBPE (Plumbing)", verifiedDate: "Aug 2026"
+},
+OH: {
+  licensing: "State (OCILB — commercial, 5 trades) + local building depts for residential + municipal overlays",
+  moat: 4, rating: "Favorable",
+  note: "VERIFIED: OCILB issues state contractor licenses for electrical, HVAC, plumbing, hydronics, and refrigeration — mandatory for commercial work (5 yrs experience, dual exams, $500K liability). Residential contractors are regulated by local building departments, and major cities (Columbus, Cleveland, Cincinnati) maintain their own registration processes on top of the state license under home-rule authority. Reciprocity exists with KY, LA, TN, and SC. The state+municipal layering plus the Columbus data-center corridor keeps this a standout.",
+  authority: "Ohio Construction Industry Licensing Board (OCILB)", verifiedDate: "Aug 2026"
+},
+NC: {
+  licensing: "State boards (PHS Board: Plumbing/Heating; separate Electrical board) — multi-classification",
+  moat: 3, rating: "Favorable",
+  note: "VERIFIED: HVAC licensing runs through the State Board of Examiners of Plumbing, Heating and Fire Sprinkler Contractors with tiered classifications (H1/H2/H3, Class I/II); electrical is a separate state board. No reciprocity agreements with any state — only a technical-exam waiver with South Carolina (NC business/law exam still required). 4,000 hours experience for contractor exams. A real, structured barrier in a high-growth market.",
+  authority: "NC State Board of Examiners of Plumbing, Heating & Fire Sprinkler Contractors", verifiedDate: "Aug 2026"
+},
+TN: {
+  licensing: "State (Board for Licensing Contractors) — CMC-C required for projects ≥ $25K",
+  moat: 2, rating: "Favorable",
+  note: "VERIFIED with a moat downgrade: the state HVAC contractor license (CMC-C) is only required for projects of $25,000 or more, which exempts much of the residential service/replacement ticket range — and Tennessee maintains broad trade-exam reciprocity (AL, AR, LA, MS, NC, OH, SC, WV, plus NASCLA scores). Both factors lower the effective barrier to greenfield entry. Demand fundamentals (Nashville growth, TCAT talent pipeline, contiguity with VA and GA) still support the Favorable rating — just don't underwrite regulatory protection here.",
+  authority: "TN Board for Licensing Contractors (BLC)", verifiedDate: "Aug 2026"
+},
+FL: {
+  licensing: "State (DBPR/CILB) — Certified statewide (Class A/B) vs Registered county-tier",
+  moat: 4, rating: "Favorable",
+  note: "VERIFIED: Florida requires state-level licensing for HVAC, plumbing, electrical, AND general contracting — broader than most states. Certified licenses (Class A unlimited / Class B ≤25 tons) require 4 years experience, two long-form exams at 70%, financial responsibility including a 660+ FICO, and background checks. Reciprocity is limited (LA, NC, MS). Enforcement is among the strictest in the country. Strong moat confirmed; the offsetting factor is that Florida is the most heavily consolidated HVAC M&A market in the US.",
+  authority: "FL Dept. of Business & Professional Regulation / CILB", verifiedDate: "Aug 2026"
+},
+VA: {
+  licensing: "State (DPOR) — dual system: business license (Class A/B/C) + individual tradesman licenses",
+  moat: 3, rating: "Favorable",
+  note: "VERIFIED: Virginia runs a two-license system — the business entity holds a DPOR contractor license (Class A/B/C by contract value; as of Sept 2025 Class A has no project cap) AND individual techs hold tradesman licenses (journeyman/master, with a Master required as Qualified Individual for Class A/B firms). Licenses are issued to businesses, not individuals, which makes acquiring an existing licensed entity structurally cleaner than building one. Local licensing applies on top in many jurisdictions.",
+  authority: "VA Dept. of Professional & Occupational Regulation (DPOR)", verifiedDate: "Aug 2026"
+}
+};
+STATE_ROWS.forEach(s => { if (VERIFIED_STATES[s.abbr]) Object.assign(s, VERIFIED_STATES[s.abbr], { verified: true }); });
+
+// ---- Current Sila operating footprint (16 states) ----
+const OPERATING_STATES = ["CT","DE","GA","IL","MA","MD","ME","MI","NH","NJ","NY","OH","PA","VA","VT","WI"];
+
+// ---- US state land adjacency (for contiguous-expansion analysis) ----
+const NEIGHBORS = {
+AL:["FL","GA","MS","TN"],AK:[],AZ:["CA","CO","NM","NV","UT"],AR:["LA","MO","MS","OK","TN","TX"],
+CA:["AZ","NV","OR"],CO:["AZ","KS","NE","NM","OK","UT","WY"],CT:["MA","NY","RI"],DE:["MD","NJ","PA"],
+FL:["AL","GA"],GA:["AL","FL","NC","SC","TN"],HI:[],ID:["MT","NV","OR","UT","WA","WY"],
+IL:["IA","IN","KY","MO","WI"],IN:["IL","KY","MI","OH"],IA:["IL","MN","MO","NE","SD","WI"],
+KS:["CO","MO","NE","OK"],KY:["IL","IN","MO","OH","TN","VA","WV"],LA:["AR","MS","TX"],ME:["NH"],
+MD:["DE","PA","VA","WV"],MA:["CT","NH","NY","RI","VT"],MI:["IN","OH","WI"],MN:["IA","ND","SD","WI"],
+MS:["AL","AR","LA","TN"],MO:["AR","IA","IL","KS","KY","NE","OK","TN"],MT:["ID","ND","SD","WY"],
+NE:["CO","IA","KS","MO","SD","WY"],NV:["AZ","CA","ID","OR","UT"],NH:["MA","ME","VT"],
+NJ:["DE","NY","PA"],NM:["AZ","CO","OK","TX"],NY:["CT","MA","NJ","PA","VT"],NC:["GA","SC","TN","VA"],
+ND:["MN","MT","SD"],OH:["IN","KY","MI","PA","WV"],OK:["AR","CO","KS","MO","NM","TX"],
+OR:["CA","ID","NV","WA"],PA:["DE","MD","NJ","NY","OH","WV"],RI:["CT","MA"],SC:["GA","NC"],
+SD:["IA","MN","MT","ND","NE","WY"],TN:["AL","AR","GA","KY","MO","MS","NC","VA"],
+TX:["AR","LA","NM","OK"],UT:["AZ","CO","ID","NV","WY"],VT:["MA","NH","NY"],
+VA:["KY","MD","NC","TN","WV"],WA:["ID","OR"],WV:["KY","MD","OH","PA","VA"],
+WI:["IA","IL","MI","MN"],WY:["CO","ID","MT","NE","SD","UT"]
+};
+
+// Expansion class per state: operating / adjacent (touches footprint) / new territory
+function stateExpansionClass(abbr) {
+  if (OPERATING_STATES.includes(abbr)) return "operating";
+  if ((NEIGHBORS[abbr]||[]).some(n => OPERATING_STATES.includes(n))) return "adjacent";
+  return "new";
+}
+
+// ---- Tile-grid cartogram coordinates [col,row] — preserves rough adjacency ----
+const TILE_GRID = {
+ME:[11,0],
+VT:[10,1],NH:[11,1],
+WA:[1,2],ID:[2,2],MT:[3,2],ND:[4,2],MN:[5,2],WI:[6,2],MI:[8,2],NY:[9,2],MA:[10,2],RI:[11,2],
+OR:[1,3],NV:[2,3],WY:[3,3],SD:[4,3],IA:[5,3],IL:[6,3],IN:[7,3],OH:[8,3],PA:[9,3],NJ:[10,3],CT:[11,3],
+CA:[1,4],UT:[2,4],CO:[3,4],NE:[4,4],MO:[5,4],KY:[6,4],WV:[7,4],VA:[8,4],MD:[9,4],DE:[10,4],
+AZ:[2,5],NM:[3,5],KS:[4,5],AR:[5,5],TN:[6,5],NC:[7,5],SC:[8,5],
+OK:[4,6],LA:[5,6],MS:[6,6],AL:[7,6],GA:[8,6],
+AK:[0,0],HI:[0,7],TX:[3,7],FL:[9,7]
+};
+
+// ---- Representative anchor markets for the current footprint ----
+// SAMPLE anchors, not the full 45-brand directory — one or two established
+// Sila markets per operating state, used only for distance estimation.
+// Swap in the real SILA_LOCATIONS list (with lat/lng) to upgrade this.
+const SILA_ANCHORS = [
+{ name:"Boston, MA", lat:42.36, lng:-71.06 },
+{ name:"Southern NH (Live Free)", lat:42.99, lng:-71.45 },
+{ name:"Portland, ME", lat:43.66, lng:-70.26 },
+{ name:"Burlington, VT", lat:44.48, lng:-73.21 },
+{ name:"Hartford, CT", lat:41.76, lng:-72.67 },
+{ name:"Westchester / Metro NY", lat:41.03, lng:-73.76 },
+{ name:"Buffalo, NY (T-Mark)", lat:42.89, lng:-78.88 },
+{ name:"North/Central NJ", lat:40.73, lng:-74.17 },
+{ name:"King of Prussia / Philadelphia, PA", lat:40.09, lng:-75.35 },
+{ name:"Pittsburgh, PA (Sullivan)", lat:40.44, lng:-79.99 },
+{ name:"Wilmington, DE", lat:39.74, lng:-75.55 },
+{ name:"Baltimore, MD", lat:39.29, lng:-76.61 },
+{ name:"Manassas, VA (My Plumber Plus)", lat:38.75, lng:-77.48 },
+{ name:"Roanoke, VA (Davis)", lat:37.27, lng:-79.94 },
+{ name:"Akron / NE Ohio (NEOH)", lat:41.08, lng:-81.52 },
+{ name:"Detroit, MI", lat:42.33, lng:-83.05 },
+{ name:"Chicago, IL", lat:41.88, lng:-87.63 },
+{ name:"Milwaukee / New Berlin, WI", lat:43.0, lng:-88.1 },
+{ name:"Atlanta, GA", lat:33.75, lng:-84.39 }
+];
+
+const METRO_COORDS = {
+charlotte:[35.23,-80.84], raleigh:[35.78,-78.64], columbus:[39.96,-83.00], phoenix:[33.45,-112.07],
+loudoun:[39.04,-77.49], richmond:[37.54,-77.44], boise:[43.62,-116.20], greenville:[34.85,-82.40],
+atlanta:[33.75,-84.39], pittsburgh:[40.44,-79.99], philadelphia:[39.95,-75.17], manchester:[42.99,-71.45],
+boston:[42.36,-71.06], hartford:[41.76,-72.67], burlington:[44.48,-73.21], portlandme:[43.66,-70.26],
+northjersey:[40.73,-74.17], hudsonvalley:[41.50,-74.02], buffalo:[42.89,-78.88], wilmington:[39.74,-75.55],
+baltimore:[39.29,-76.61], chicago:[41.88,-87.63], milwaukee:[43.04,-87.91], detroit:[42.33,-83.05],
+grandrapids:[42.96,-85.66], indianapolis:[39.77,-86.16], nashville:[36.16,-86.78], louisville:[38.25,-85.76],
+minneapolis:[44.98,-93.27], kansascity:[39.10,-94.58], denver:[39.74,-104.99], tampa:[27.95,-82.46],
+sanantonio:[29.42,-98.49], dallas:[32.78,-96.80]
+};
+
+// ============================================================
+// STATE LAYERS — supply chain & talent-pipeline data (SAMPLE)
+// Distributor presence is modeled from public branch-network
+// footprints; trade-school figures are directional counts with
+// one flagship program named per state. Validate before use.
+// ============================================================
+
+// National distributors present in effectively every state
+const NATIONAL_DISTRIBUTORS = ["Ferguson", "Winsupply", "Johnstone Supply", "Hajoca (plumbing)"];
+
+// Regional distributors → the states where they have meaningful branch density
+const REGIONAL_DISTRIBUTORS = {
+"F.W. Webb": ["CT","MA","ME","NH","NJ","NY","PA","RI","VT"],
+"R.E. Michel": ["AL","CT","DE","FL","GA","IL","IN","KY","MA","MD","MS","NC","NJ","NY","OH","PA","SC","TN","VA","WV"],
+"Watsco (Gemaire / Baker)": ["AL","AZ","CA","FL","GA","LA","MS","NC","NV","SC","TN","TX","VA"],
+"APR Supply": ["PA"],
+"Torrington Supply": ["CT"],
+"Thos. Somerville (plumbing)": ["DE","MD","VA"],
+"Behler-Young": ["MI","OH"],
+"Gustave A. Larson": ["CO","IA","ID","IL","MN","MT","ND","NE","SD","UT","WI","WY"],
+"Crescent Parts & Equipment": ["IL","MO"],
+"O'Connor Company": ["AR","IA","KS","MO","NE","OK"],
+"Insco Distributing / Century A/C": ["NM","OK","TX"],
+"Slakey Brothers": ["CA","NV","OR"],
+"Geary Pacific": ["AK","AZ","CA","HI","ID","NV","OR","UT","WA"],
+"RSD (Refrigeration Supplies Distributor)": ["AK","AZ","CA","HI","ID","MT","NV","OR","WA"]
+};
+
+function distributorsFor(abbr) {
+  const regional = Object.entries(REGIONAL_DISTRIBUTORS)
+    .filter(([name, states]) => states.includes(abbr))
+    .map(([name]) => name);
+  return { national: NATIONAL_DISTRIBUTORS, regional };
+}
+
+// Trade-school layer: directional program counts + one flagship institution
+const TRADE_SCHOOLS = {
+AL:{count:14,notable:"Lawson State CC (Birmingham)"}, AK:{count:3,notable:"AVTEC (Seward)"},
+AZ:{count:16,notable:"The Refrigeration School / GateWay CC (Phoenix)"}, AR:{count:9,notable:"Arkansas Tech University"},
+CA:{count:48,notable:"LA Trade-Technical College"}, CO:{count:12,notable:"Emily Griffith Technical College (Denver)"},
+CT:{count:11,notable:"Porter & Chester Institute"}, DE:{count:4,notable:"Delaware Tech"},
+FL:{count:34,notable:"Pinellas Technical College"}, GA:{count:22,notable:"Lanier Technical College"},
+HI:{count:3,notable:"Honolulu CC"}, ID:{count:6,notable:"College of Western Idaho (Boise)"},
+IL:{count:24,notable:"Coyne College (Chicago)"}, IN:{count:19,notable:"Ivy Tech (statewide system)"},
+IA:{count:11,notable:"Des Moines Area CC"}, KS:{count:9,notable:"WSU Tech (Wichita)"},
+KY:{count:13,notable:"Jefferson Community & Technical College (Louisville)"}, LA:{count:12,notable:"Delgado CC (New Orleans)"},
+ME:{count:5,notable:"Southern Maine CC"}, MD:{count:10,notable:"North American Trade Schools (Baltimore)"},
+MA:{count:14,notable:"Franklin Cummings Tech (Boston)"}, MI:{count:20,notable:"Ferris State University (nationally known HVACR program)"},
+MN:{count:14,notable:"Saint Paul College"}, MS:{count:10,notable:"Hinds CC"},
+MO:{count:15,notable:"Ranken Technical College (St. Louis — flagship trades school)"}, MT:{count:4,notable:"MSU-Northern (Havre)"},
+NE:{count:7,notable:"Metropolitan CC (Omaha)"}, NV:{count:6,notable:"College of Southern Nevada"},
+NH:{count:5,notable:"Manchester CC"}, NJ:{count:15,notable:"Lincoln Tech (Union)"},
+NM:{count:6,notable:"Central New Mexico CC"}, NY:{count:30,notable:"Apex Technical School (NYC) / SUNY trades network"},
+NC:{count:24,notable:"Central Piedmont CC (Charlotte)"}, ND:{count:4,notable:"Bismarck State College"},
+OH:{count:26,notable:"Columbus State CC + Trade Masters Academy (now in-house via NEOH)"}, OK:{count:10,notable:"OSU Institute of Technology (Okmulgee)"},
+OR:{count:9,notable:"Portland CC"}, PA:{count:28,notable:"Pennsylvania College of Technology + Thaddeus Stevens (both flagship)"},
+RI:{count:4,notable:"New England Institute of Technology (Warwick — flagship)"}, SC:{count:14,notable:"Trident Technical College (Charleston)"},
+SD:{count:4,notable:"Lake Area Tech (Watertown — nationally ranked)"}, TN:{count:18,notable:"TCAT network (27 campuses statewide — a genuine pipeline asset)"},
+TX:{count:40,notable:"Texas State Technical College (multi-campus)"}, UT:{count:8,notable:"Salt Lake CC"},
+VT:{count:3,notable:"Vermont State University (Randolph trades campus)"}, VA:{count:18,notable:"Northern Virginia CC (data-center ops programs)"},
+WA:{count:12,notable:"Bates Technical College (Tacoma)"}, WV:{count:6,notable:"BridgeValley CTC"},
+WI:{count:16,notable:"Milwaukee Area Technical College (MATC)"}, WY:{count:3,notable:"Casper College"}
+};
+
+function haversineMiles(lat1,lng1,lat2,lng2){
+  const R=3958.8, toRad=d=>d*Math.PI/180;
+  const dLat=toRad(lat2-lat1), dLng=toRad(lng2-lng1);
+  const a=Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+function nearestAnchor(metroId){
+  const c = METRO_COORDS[metroId];
+  if (!c) return null;
+  let best=null;
+  for (const a of SILA_ANCHORS){
+    const d = haversineMiles(c[0],c[1],a.lat,a.lng);
+    if (!best || d < best.miles) best = { name:a.name, miles:Math.round(d) };
+  }
+  return best;
+}
+
+const METHODOLOGY = [
+{ title:"Layer 1 — State Regulatory & Incentive Climate", body:"Licensing structure (state-only vs. state+municipal/county) is scored as a moat: harder greenfield entry is a defensibility asset once Sila owns the license through acquisition, not just a cost of doing business. Incentive exposure is scored separately because it cuts the other way — high dependency on programs like Mass Save or Efficiency Maine inflates recent performance and raises the risk that a policy change (administration, budget cycle) suppresses it, typically alongside a shift toward mini-split/ductless work that doesn't follow the same revenue rhythm as full-system installs." },
+{ title:"Layer 2 — Metro & City Demographic Drill-Down", body:"Within a favorable state, the Home Depot site-selection logic applies: target neighborhoods with an aging, homogenous housing stock built by a national builder roughly 15–25 years ago, because system replacement demand becomes predictable at scale. Median home age, builder-era concentration, population density, and income band are the primary proxies." },
+{ title:"Layer 3 — Labor Market & Adjacent Industry Dynamics", body:"Adjacent industrial buildout (data centers, advanced manufacturing) is a double-edged signal. It raises demand (more facilities need mechanical/electrical work) but can also drain trades labor into higher-paying construction work. The net effect modeled here: markets losing labor to adjacent construction often see reduced competition in residential service and replacement, creating a margin opportunity for an operator willing to stay in that lane rather than chase the construction wage premium." },
+{ title:"Layer 4 — Target Company Profile Matching", body:"Company-level sliders (residential↔commercial mix, single↔multi trade, single↔multi location) are matched against each metro's characteristics to surface which metros best fit a given acquisition thesis, plus an illustrative acquisition archetype — a representative profile, not an actual company — describing the kind of target that tends to exist in that market." }
+];
+
+const PRODUCTIONIZE_NOTES = [
+"Replace sample state licensing data with a validated dataset sourced from each state contracting/licensing board.",
+"Replace sample metro demographics with Census/ACS pulls (housing age, income, density) refreshed on a defined cadence.",
+"Connect competitive-density figures to an actual business-listing or D&B-style data feed rather than illustrative estimates.",
+"Connect adjacent-industry signals to a live economic-development or commercial real estate data feed (e.g. announced capex, permit filings).",
+"Replace illustrative acquisition archetypes with real target-company data once the M&A team has a sourcing pipeline connected.",
+"Add authentication and a persistence layer if this becomes a shared, continuously updated M&A working tool rather than a scorecard prototype."
+];
+</script>
+
+<script type="text/babel">
+const { useState, useMemo } = React;
+
+// ---- Print helper: builds a clean printable doc in a new window ----
+function openPrint(title, bodyHtml) {
+  const w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write(`<!DOCTYPE html><html><head><title>${title}</title>
+  <style>
+    body{font-family:Georgia,serif;color:#1a2733;margin:36px;line-height:1.5;}
+    h1{font-size:22px;border-bottom:2px solid #0A1826;padding-bottom:8px;}
+    h2{font-size:16px;margin-top:24px;color:#0A1826;}
+    table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px;}
+    th,td{border:1px solid #c9d3dc;padding:6px 9px;text-align:left;vertical-align:top;}
+    th{background:#eef2f6;}
+    .disc{font-size:11px;color:#6a7a88;border:1px solid #c9d3dc;padding:8px 12px;margin:14px 0;background:#f7f9fb;}
+    .badge{font-weight:bold;}
+    .meta{font-size:11px;color:#6a7a88;margin-top:2px;}
+  </style></head><body>
+  <h1>Sila Services — M&A Market Navigator · ${title}</h1>
+  <div class="meta">Generated ${new Date().toLocaleDateString()} · Data updated ${KB_LAST_UPDATED}</div>
+  <div class="disc">⚠ ${DISCLAIMER}</div>
+  ${bodyHtml}
+  </body></html>`);
+  w.document.close();
+  setTimeout(() => w.print(), 500);
+}
+
+// ---- "What if" scenario cards for the Start Here tab ----
+const SCENARIOS = [
+  { q: "What if a target's revenue is riding on incentives?", a: "Portland ME and Manchester NH show the pattern: heat-pump incentive programs inflate current-year performance and shift the mix toward mini-split/ductless work. Underwrite as if the incentive-dependent share can compress on a policy change.", tab: "metros" },
+  { q: "What if a data center boom is draining local trades labor?", a: "Columbus and Loudoun County show the double edge: labor gets pulled into construction at a wage premium — but service and replacement competition thins out, creating a margin opportunity for whoever stays in that lane.", tab: "metros" },
+  { q: "What if licensing in a state looks like a headache?", a: "Reframe it. State + municipal licensing (IL, NJ, MA, NY, PA) is a moat you buy through via acquisition — and a wall greenfield competitors have to climb after you.", tab: "states" },
+  { q: "What if a big market has almost no licensing barrier?", a: "Texas is the caution case: a very large market with the weakest moat in the dataset. Expect a fragmented competitive set and easier greenfield entry against you post-close.", tab: "states" },
+  { q: "What if we know the profile but not the market?", a: "Set the sliders — residential↔commercial mix, trade count, footprint — and let the fit ranking surface which metros match the thesis before anyone books a flight.", tab: "match" },
+  { q: "What if the housing stock tells us where to look?", a: "The Home Depot logic: national-builder subdivisions 15–25 years old mean predictable, homogenous replacement demand. Charlotte, Atlanta, and Indianapolis show this vintage concentration.", tab: "metros" }
+];
+
+const SS = `
+  * { box-sizing: border-box; }
+  body { margin:0; background:#0A1826; color:#E7EDF3; font-family:'DM Sans',sans-serif; }
+  .wrap { max-width:1180px; margin:0 auto; padding:36px 24px 80px; }
+  .eyebrow { font-size:12px; letter-spacing:2.5px; text-transform:uppercase; color:#8FA6BC; font-weight:600; }
+  h1.title { font-family:'DM Serif Display',serif; font-size:44px; color:#F4EEDD; margin:10px 0 6px; font-weight:400; }
+  .sub { color:#9FB3C6; font-size:15px; margin-bottom:22px; }
+  .top-row { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; }
+  .badge-count { text-align:right; }
+  .badge-count .num { font-family:'DM Serif Display',serif; font-size:32px; color:#E8C468; }
+  .badge-count .lbl { font-size:12px; color:#9FB3C6; }
+  .pill-updated { display:inline-block; margin-top:8px; font-size:12px; padding:4px 10px; border-radius:20px; background:rgba(232,196,104,0.12); color:#E8C468; border:1px solid rgba(232,196,104,0.3); }
+  .tabs { display:flex; gap:28px; border-bottom:1px solid rgba(255,255,255,0.1); margin:28px 0 24px; flex-wrap:wrap; }
+  .tab { padding:10px 2px 14px; cursor:pointer; color:#8FA6BC; font-weight:600; font-size:14.5px; border-bottom:2px solid transparent; white-space:nowrap; }
+  .tab.active { color:#E8C468; border-bottom-color:#E8C468; }
+  .card { background:#0F2233; border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:22px 24px; margin-bottom:16px; }
+  .disclaimer { background:rgba(232,196,104,0.08); border:1px solid rgba(232,196,104,0.35); border-radius:12px; padding:14px 18px; font-size:13px; color:#E8C468; margin-bottom:24px; line-height:1.5; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  @media(max-width:800px){ .grid2,.grid3{ grid-template-columns:1fr; } }
+  .toggle-row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; }
+  .pill-btn { padding:9px 16px; border-radius:22px; border:1px solid rgba(255,255,255,0.15); background:transparent; color:#C6D4E1; cursor:pointer; font-size:13.5px; font-weight:600; font-family:'DM Sans',sans-serif; }
+  .pill-btn.active { background:#E8C468; color:#0A1826; border-color:#E8C468; }
+  select, input[type=text] { width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.15); background:#0A1826; color:#E7EDF3; font-size:14px; font-family:'DM Sans',sans-serif; }
+  .state-row { display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-radius:10px; background:#0F2233; border:1px solid rgba(255,255,255,0.07); margin-bottom:8px; cursor:pointer; }
+  .state-row:hover { border-color:rgba(232,196,104,0.4); }
+  .state-name { font-weight:700; font-size:15px; }
+  .state-meta { font-size:12.5px; color:#8FA6BC; margin-top:2px; }
+  .rating-badge { font-size:11.5px; font-weight:700; padding:4px 10px; border-radius:16px; white-space:nowrap; }
+  .rating-Favorable { background:rgba(94,196,120,0.15); color:#7EDB9C; border:1px solid rgba(94,196,120,0.4); }
+  .rating-Watch { background:rgba(232,196,104,0.15); color:#E8C468; border:1px solid rgba(232,196,104,0.4); }
+  .rating-Caution { background:rgba(224,110,96,0.15); color:#F0897A; border:1px solid rgba(224,110,96,0.4); }
+  .expand-body { margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.08); font-size:13.5px; color:#C6D4E1; line-height:1.6; }
+  .moat-bars { display:flex; gap:3px; margin-top:4px; }
+  .moat-bar { width:14px; height:6px; border-radius:3px; background:rgba(255,255,255,0.12); }
+  .moat-bar.filled { background:#E8C468; }
+  .metro-card { background:#0F2233; border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:20px 22px; margin-bottom:14px; }
+  .metro-head { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; }
+  .metro-name { font-family:'DM Serif Display',serif; font-size:22px; color:#F4EEDD; }
+  .metro-state { color:#8FA6BC; font-size:13px; }
+  .score-chip { text-align:center; background:rgba(232,196,104,0.1); border:1px solid rgba(232,196,104,0.35); border-radius:10px; padding:6px 14px; }
+  .score-chip .n { font-family:'DM Serif Display',serif; font-size:22px; color:#E8C468; }
+  .score-chip .l { font-size:10px; color:#C6D4E1; letter-spacing:1px; text-transform:uppercase; }
+  .stat-row { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:14px 0; }
+  @media(max-width:800px){ .stat-row{ grid-template-columns:1fr 1fr; } }
+  .stat { background:rgba(255,255,255,0.03); border-radius:8px; padding:8px 10px; }
+  .stat .k { font-size:10.5px; color:#8FA6BC; text-transform:uppercase; letter-spacing:0.5px; }
+  .stat .v { font-size:14px; color:#E7EDF3; font-weight:600; margin-top:2px; }
+  .note-line { font-size:13px; color:#C6D4E1; margin-top:8px; line-height:1.6; }
+  .note-label { color:#8FA6BC; font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:0.5px; margin-right:6px; }
+  .flag { background:rgba(232,196,104,0.1); border:1px solid rgba(232,196,104,0.35); border-radius:8px; padding:8px 12px; font-size:12.5px; color:#E8C468; margin-top:10px; }
+  .archetype-box { background:rgba(255,255,255,0.03); border-left:3px solid #E8C468; border-radius:6px; padding:10px 14px; margin-top:12px; font-size:13px; color:#E7EDF3; }
+  .slider-block { margin-bottom:22px; }
+  .slider-label { display:flex; justify-content:space-between; font-size:13.5px; font-weight:600; color:#E7EDF3; margin-bottom:8px; }
+  input[type=range] { width:100%; accent-color:#E8C468; }
+  .slider-ends { display:flex; justify-content:space-between; font-size:11.5px; color:#8FA6BC; margin-top:4px; }
+  .rank-num { font-family:'DM Serif Display',serif; font-size:20px; color:#E8C468; width:32px; }
+  .method-title { font-family:'DM Serif Display',serif; font-size:19px; color:#F4EEDD; margin-bottom:6px; }
+  .footer-note { font-size:12px; color:#5F7488; margin-top:40px; text-align:center; }
+  a.link { color:#E8C468; }
+  .print-btn { padding:9px 18px; border-radius:10px; border:1px solid rgba(232,196,104,0.5); background:rgba(232,196,104,0.08); color:#E8C468; cursor:pointer; font-size:13px; font-weight:700; font-family:'DM Sans',sans-serif; }
+  .print-btn:hover { background:rgba(232,196,104,0.16); }
+  .scen-q { font-weight:700; font-size:14.5px; color:#F4EEDD; margin-bottom:6px; }
+  .scen-a { font-size:13px; color:#C6D4E1; line-height:1.6; }
+  .scen-go { margin-top:10px; font-size:12.5px; color:#E8C468; font-weight:700; }
+  .cross-link { display:inline-block; margin-top:10px; font-size:12.5px; color:#E8C468; font-weight:700; cursor:pointer; }
+  .map-wrap { background:#0F2233; border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:18px 20px 10px; margin-bottom:18px; }
+  .map-tile { cursor:pointer; }
+  .map-tile rect { transition: opacity 0.12s; }
+  .map-tile:hover rect { opacity:0.75; }
+  .map-legend { display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:#C6D4E1; padding:10px 4px 8px; }
+  .leg-item { display:flex; align-items:center; gap:6px; }
+  .leg-swatch { width:12px; height:12px; border-radius:3px; display:inline-block; }
+  .fp-badge { font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:12px; background:rgba(232,196,104,0.15); color:#E8C468; border:1px solid rgba(232,196,104,0.4); margin-left:8px; white-space:nowrap; }
+  .terr-chip { font-size:11px; font-weight:700; padding:3px 9px; border-radius:12px; white-space:nowrap; }
+  .terr-operating { background:rgba(232,196,104,0.15); color:#E8C468; border:1px solid rgba(232,196,104,0.4); }
+  .terr-adjacent { background:rgba(110,190,210,0.15); color:#8FD8E8; border:1px solid rgba(110,190,210,0.4); }
+  .terr-new { background:rgba(255,255,255,0.06); color:#AEBFCE; border:1px solid rgba(255,255,255,0.2); }
+  .ver-badge { font-size:10px; font-weight:700; padding:3px 8px; border-radius:12px; background:rgba(94,196,120,0.15); color:#7EDB9C; border:1px solid rgba(94,196,120,0.4); margin-left:8px; white-space:nowrap; }
+  .sample-badge { font-size:10px; font-weight:700; padding:3px 8px; border-radius:12px; background:rgba(255,255,255,0.05); color:#8FA6BC; border:1px solid rgba(255,255,255,0.15); margin-left:8px; white-space:nowrap; }
+`;
+
+function MoatBars({ moat }) {
+  return (
+    <div className="moat-bars">
+      {[1,2,3,4,5].map(i => <div key={i} className={"moat-bar" + (i<=moat ? " filled" : "")}></div>)}
+    </div>
+  );
+}
+
+function StartHere({ goTo }) {
+  return (
+    <div>
+      <div className="card">
+        <div className="method-title">What this tool does</div>
+        <p className="note-line">
+          Regulatory complexity that makes greenfield expansion hard is exactly the kind of friction an acquisition lets Sila buy through. This tool reframes state licensing, incentive exposure, and local demographics as a layered market-attractiveness model for M&A targeting — state climate first, then metro-level siting signals, then labor-market dynamics, then company-profile matching.
+        </p>
+      </div>
+      <div className="grid2">
+        <div className="card" onClick={() => goTo("states")} style={{cursor:"pointer"}}>
+          <div className="method-title" style={{fontSize:16}}>1. State Scorecard →</div>
+          <p className="note-line">Screen all 50 states on licensing moat strength and incentive-driven volatility.</p>
+        </div>
+        <div className="card" onClick={() => goTo("metros")} style={{cursor:"pointer"}}>
+          <div className="method-title" style={{fontSize:16}}>2. Market Drill-Down →</div>
+          <p className="note-line">Go metro-level: housing stock age, density, and adjacent-industry labor dynamics.</p>
+        </div>
+        <div className="card" onClick={() => goTo("match")} style={{cursor:"pointer"}}>
+          <div className="method-title" style={{fontSize:16}}>3. Target Profile Matching →</div>
+          <p className="note-line">Slide residential↔commercial mix, trade count, and footprint to rank the best-fit metros.</p>
+        </div>
+        <div className="card" onClick={() => goTo("method")} style={{cursor:"pointer"}}>
+          <div className="method-title" style={{fontSize:16}}>4. Methodology →</div>
+          <p className="note-line">How each layer is scored, and what it would take to productionize this with real data feeds.</p>
+        </div>
+      </div>
+
+      <div className="method-title" style={{margin:"28px 0 14px"}}>What if…?</div>
+      <div className="grid2">
+        {SCENARIOS.map((s,i) => (
+          <div key={i} className="card" onClick={() => goTo(s.tab)} style={{cursor:"pointer", marginBottom:0}}>
+            <div className="scen-q">{s.q}</div>
+            <div className="scen-a">{s.a}</div>
+            <div className="scen-go">See it in the tool →</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const RATING_COLORS = { Favorable:"#4FA96C", Watch:"#C9A448", Caution:"#C96A5A" };
+const FOOTPRINT_COLORS = { operating:"#E8C468", adjacent:"#5FA8BD", new:"#22384C" };
+
+function USTileMap({ mode, selected, onSelect }) {
+  const CELL = 44, GAP = 5;
+  const cols = 12, rows = 8;
+  const W = cols*(CELL+GAP), H = rows*(CELL+GAP);
+  const byAbbr = Object.fromEntries(STATE_ROWS.map(s => [s.abbr, s]));
+  return (
+    <div className="map-wrap">
+      <svg viewBox={`0 0 ${W} ${H}`} style={{width:"100%", height:"auto", display:"block"}} role="img" aria-label="US state tile map">
+        {Object.entries(TILE_GRID).map(([abbr,[c,r]]) => {
+          const s = byAbbr[abbr];
+          const cls = stateExpansionClass(abbr);
+          const fill = mode === "footprint" ? FOOTPRINT_COLORS[cls] : RATING_COLORS[s.rating];
+          const isSel = selected === abbr;
+          const isOp = OPERATING_STATES.includes(abbr);
+          return (
+            <g key={abbr} className="map-tile" onClick={() => onSelect(abbr)}>
+              <rect x={c*(CELL+GAP)} y={r*(CELL+GAP)} width={CELL} height={CELL} rx="8"
+                fill={fill}
+                stroke={isSel ? "#F4EEDD" : (isOp && mode !== "footprint" ? "#E8C468" : "rgba(255,255,255,0.12)")}
+                strokeWidth={isSel ? 3 : (isOp && mode !== "footprint" ? 2 : 1)} />
+              <text x={c*(CELL+GAP)+CELL/2} y={r*(CELL+GAP)+CELL/2+1} textAnchor="middle" dominantBaseline="middle"
+                fontSize="14" fontWeight="700" fontFamily="DM Sans, sans-serif"
+                fill={mode==="footprint" && cls==="new" ? "#7A93A9" : "#0A1826"}
+                style={{pointerEvents:"none"}}>{abbr}</text>
+              {isOp && mode !== "footprint" && (
+                <circle cx={c*(CELL+GAP)+CELL-8} cy={r*(CELL+GAP)+8} r="3.5" fill="#0A1826" stroke="#E8C468" strokeWidth="1.5" style={{pointerEvents:"none"}} />
+              )}
+            </g>
+          );
+        })}
+      </svg>
+      <div className="map-legend">
+        {mode === "footprint" ? (
+          <React.Fragment>
+            <span className="leg-item"><span className="leg-swatch" style={{background:FOOTPRINT_COLORS.operating}}></span> Current footprint (16 states)</span>
+            <span className="leg-item"><span className="leg-swatch" style={{background:FOOTPRINT_COLORS.adjacent}}></span> Adjacent — contiguous expansion</span>
+            <span className="leg-item"><span className="leg-swatch" style={{background:FOOTPRINT_COLORS.new, border:"1px solid rgba(255,255,255,0.2)"}}></span> New territory</span>
+          </React.Fragment>
+        ) : (
+          <React.Fragment>
+            <span className="leg-item"><span className="leg-swatch" style={{background:RATING_COLORS.Favorable}}></span> Favorable</span>
+            <span className="leg-item"><span className="leg-swatch" style={{background:RATING_COLORS.Watch}}></span> Watch</span>
+            <span className="leg-item"><span className="leg-swatch" style={{background:RATING_COLORS.Caution}}></span> Caution</span>
+            <span className="leg-item"><span className="leg-swatch" style={{background:"transparent", border:"2px solid #E8C468"}}></span> Gold ring = current Sila state</span>
+          </React.Fragment>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function StateDetail({ s, goToMetros }) {
+  const cls = stateExpansionClass(s.abbr);
+  const opNeighbors = (NEIGHBORS[s.abbr]||[]).filter(n => OPERATING_STATES.includes(n));
+  return (
+    <div className="card">
+      <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:10}}>
+        <div>
+          <div className="method-title" style={{marginBottom:2}}>{s.name} ({s.abbr})
+            {cls === "operating" && <span className="fp-badge">CURRENT FOOTPRINT</span>}
+            {cls === "adjacent" && <span className="fp-badge" style={{background:"rgba(110,190,210,0.15)", color:"#8FD8E8", borderColor:"rgba(110,190,210,0.4)"}}>CONTIGUOUS EXPANSION</span>}
+            {s.verified ? <span className="ver-badge">✓ VERIFIED {s.verifiedDate}</span> : <span className="sample-badge">SAMPLE DATA</span>}
+          </div>
+          <div className="state-meta">{s.licensing} · Incentive exposure: {s.incentive}{s.authority && <span> · Authority: {s.authority}</span>}</div>
+        </div>
+        <span className={"rating-badge rating-" + s.rating}>{s.rating}</span>
+      </div>
+      <div className="grid2" style={{marginTop:14}}>
+        <div>
+          <div className="note-label">Moat strength</div>
+          <MoatBars moat={s.moat} />
+          <div className="note-line">{MOAT_LABELS[s.moat]}</div>
+        </div>
+        <div>
+          <div className="note-label">Contiguity</div>
+          <div className="note-line">
+            {cls === "operating" && "Sila already operates here — metro-level densification is the play."}
+            {cls === "adjacent" && `Borders current Sila state${opNeighbors.length>1?"s":""}: ${opNeighbors.join(", ")} — expansion here extends the existing regional footprint rather than opening an island.`}
+            {cls === "new" && "Not contiguous with the current footprint — entering here means standing up an isolated regional presence."}
+          </div>
+        </div>
+      </div>
+      <div className="expand-body">{s.note}</div>
+      <div className="grid2" style={{marginTop:12}}>
+        <div>
+          <div className="note-label">Distributor Coverage (sample)</div>
+          <div className="note-line">
+            National: {distributorsFor(s.abbr).national.join(", ")}.
+            {distributorsFor(s.abbr).regional.length > 0 && <span> Regional: {distributorsFor(s.abbr).regional.join(", ")}.</span>}
+          </div>
+        </div>
+        <div>
+          <div className="note-label">Trade-School Pipeline (sample)</div>
+          <div className="note-line">~{TRADE_SCHOOLS[s.abbr].count} accredited trades programs · Flagship: {TRADE_SCHOOLS[s.abbr].notable}</div>
+        </div>
+      </div>
+      {METROS.some(m => m.state === s.abbr) && (
+        <span className="cross-link" onClick={() => goToMetros(s.abbr)}>
+          View sample metro{METROS.filter(m => m.state === s.abbr).length > 1 ? "s" : ""} in {s.name}: {METROS.filter(m => m.state === s.abbr).map(m => m.name).join(", ")} →
+        </span>
+      )}
+    </div>
+  );
+}
+
+function printStates(rows, filter) {
+  const body = `
+    <h2>State Scorecard${filter !== "All" ? " — " + filter + " states only" : ""} (${rows.length} states)</h2>
+    <table><tr><th>State</th><th>Licensing Model</th><th>Moat (1–5)</th><th>Incentive Exposure</th><th>Rating</th><th>Rationale</th></tr>
+    ${rows.map(s => `<tr><td><span class="badge">${s.name}</span> (${s.abbr})</td><td>${s.licensing}</td><td>${s.moat} — ${MOAT_LABELS[s.moat]}</td><td>${s.incentive}</td><td class="badge">${s.rating}</td><td>${s.note}</td></tr>`).join("")}
+    </table>`;
+  openPrint("State Scorecard", body);
+}
+
+function StatesTab({ goToMetros }) {
+  const [filter, setFilter] = useState("All");
+  const [search, setSearch] = useState("");
+  const [openState, setOpenState] = useState(null);
+  const [mapMode, setMapMode] = useState("rating");
+  const byAbbr = Object.fromEntries(STATE_ROWS.map(s => [s.abbr, s]));
+  const filtered = STATE_ROWS.filter(s =>
+    (filter === "All" || s.rating === filter) &&
+    (search.trim() === "" || s.name.toLowerCase().includes(search.toLowerCase()) || s.abbr.toLowerCase() === search.trim().toLowerCase())
+  );
+  return (
+    <div>
+      <div className="toggle-row" style={{marginBottom:10}}>
+        <button className={"pill-btn" + (mapMode==="rating" ? " active":"")} onClick={()=>setMapMode("rating")}>Color by M&A Rating</button>
+        <button className={"pill-btn" + (mapMode==="footprint" ? " active":"")} onClick={()=>setMapMode("footprint")}>Color by Footprint & Contiguity</button>
+      </div>
+      <USTileMap mode={mapMode} selected={openState} onSelect={(abbr) => setOpenState(openState === abbr ? null : abbr)} />
+      {openState && byAbbr[openState] && (
+        <StateDetail s={byAbbr[openState]} goToMetros={goToMetros} />
+      )}
+      {!openState && (
+        <div className="sub" style={{marginTop:-6, marginBottom:16}}>Tap any state tile for its full detail — moat strength, contiguity with the current footprint, and its sample metros.</div>
+      )}
+      <div style={{display:"flex", gap:12, flexWrap:"wrap", alignItems:"center", marginBottom:14}}>
+        <div style={{flex:"1 1 260px"}}>
+          <input type="text" placeholder="🔍 Search a state by name or abbreviation…" value={search} onChange={e=>setSearch(e.target.value)} />
+        </div>
+        <button className="print-btn" onClick={() => printStates(filtered, filter)}>🖨 Print Scorecard</button>
+      </div>
+      <div className="toggle-row">
+        {["All","Favorable","Watch","Caution"].map(f => (
+          <button key={f} className={"pill-btn" + (filter===f ? " active":"")} onClick={()=>setFilter(f)}>{f}</button>
+        ))}
+      </div>
+      <div className="sub" style={{marginTop:-8, marginBottom:16}}>Showing {filtered.length} of 50 states — tap a row for licensing detail and rationale.</div>
+      {filtered.map(s => (
+        <div key={s.abbr}>
+          <div className="state-row" style={openState===s.abbr ? {borderColor:"#E8C468"} : null} onClick={() => { setOpenState(openState===s.abbr ? null : s.abbr); window.scrollTo({top:0, behavior:"smooth"}); }}>
+            <div>
+              <div className="state-name">{s.name} <span style={{color:"#8FA6BC",fontWeight:400}}>({s.abbr})</span>{OPERATING_STATES.includes(s.abbr) && <span className="fp-badge">FOOTPRINT</span>}{s.verified ? <span className="ver-badge">✓ VERIFIED</span> : <span className="sample-badge">SAMPLE</span>}</div>
+              <div className="state-meta">{s.licensing} · Incentive exposure: {s.incentive}</div>
+            </div>
+            <span className={"rating-badge rating-" + s.rating}>{s.rating}</span>
+          </div>
+        </div>
+      ))}
+      {filtered.length === 0 && (
+        <div className="card">No states match "{search}". Clear the search or switch the rating filter to see more.</div>
+      )}
+    </div>
+  );
+}
+
+const METRO_PATTERNS = {
+  "All": () => true,
+  "Data-Center Labor Markets": m => /Very High|High/.test(m.laborDrain),
+  "Incentive-Volatility Flags": m => !!m.incentiveFlag,
+  "Aging Tract Housing (15–30 yrs)": m => m.homeAge >= 15 && m.homeAge <= 30
+};
+
+function printMetros(rows) {
+  const body = `
+    <h2>Market Drill-Down — ${rows.length} sample metro${rows.length === 1 ? "" : "s"}</h2>
+    <table><tr><th>Metro</th><th>Score</th><th>Territory</th><th>Distance to Nearest Sila Market</th><th>Home Age</th><th>Adjacent Industry</th><th>Labor Drain</th><th>Acquisition Archetype (illustrative)</th></tr>
+    ${rows.map(m => { const near = nearestAnchor(m.id); const cls = stateExpansionClass(m.state); const terr = cls==="operating"?"In Footprint":cls==="adjacent"?"Contiguous Expansion":"New Territory"; return `<tr><td><span class="badge">${m.name}, ${m.state}</span><div class="meta">${m.population} · ${m.income} median income</div></td><td class="badge">${m.score}</td><td>${terr}</td><td>${near ? "~" + near.miles + " mi (" + near.name + ")" : "—"}</td><td>${m.homeAge} yrs</td><td>${m.adjacentIndustry}</td><td>${m.laborDrain}</td><td>${m.archetype}</td></tr>`; }).join("")}
+    </table>
+    ${rows.some(m => m.incentiveFlag) ? `<h2>Incentive-Volatility Flags</h2><table><tr><th>Metro</th><th>Flag</th></tr>${rows.filter(m => m.incentiveFlag).map(m => `<tr><td class="badge">${m.name}, ${m.state}</td><td>${m.incentiveFlag}</td></tr>`).join("")}</table>` : ""}`;
+  openPrint("Market Drill-Down", body);
+}
+
+function MetrosTab({ stateFilter, clearStateFilter }) {
+  const [openId, setOpenId] = useState(null);
+  const [pattern, setPattern] = useState("All");
+  const [stateSel, setStateSel] = useState("All");
+  const metroStates = [...new Set(METROS.map(m => m.state))].sort();
+  const effectiveState = stateFilter || (stateSel === "All" ? null : stateSel);
+  const shown = METROS.filter(m =>
+    (!effectiveState || m.state === effectiveState) && METRO_PATTERNS[pattern](m)
+  ).sort((a,b) => b.score - a.score);
+  return (
+    <div>
+      <div className="sub" style={{marginTop:-10}}>{METROS.length} illustrative sample metros covering every current operating state plus key expansion candidates — sorted by target score. Patterns span aging tract-housing replacement demand, data-center-driven labor competition, and New England incentive volatility.</div>
+      <div style={{display:"flex", gap:12, flexWrap:"wrap", alignItems:"center", marginBottom:14}}>
+        <div style={{flex:"0 0 220px"}}>
+          <select value={effectiveState || "All"} onChange={e => { clearStateFilter(); setStateSel(e.target.value); }}>
+            <option value="All">All states ({METROS.length} metros)</option>
+            {metroStates.map(st => <option key={st} value={st}>{st} ({METROS.filter(m=>m.state===st).length})</option>)}
+          </select>
+        </div>
+        <div className="toggle-row" style={{marginBottom:0, flex:1}}>
+          {Object.keys(METRO_PATTERNS).map(p => (
+            <button key={p} className={"pill-btn" + (pattern===p ? " active":"")} onClick={()=>setPattern(p)}>{p}</button>
+          ))}
+        </div>
+        <button className="print-btn" onClick={() => printMetros(shown)}>🖨 Print Market Brief</button>
+      </div>
+      {stateFilter && (
+        <div className="flag" style={{marginBottom:14}}>
+          Showing metros in {stateFilter} only. <span className="cross-link" style={{marginTop:0}} onClick={clearStateFilter}>Show all metros →</span>
+        </div>
+      )}
+      {shown.length === 0 && (
+        <div className="card">No sample metros match this combination — switch the pattern filter{stateFilter ? " or clear the state filter" : ""}.</div>
+      )}
+      {shown.map(m => {
+        const near = nearestAnchor(m.id);
+        const cls = stateExpansionClass(m.state);
+        return (
+        <div key={m.id} className="metro-card">
+          <div className="metro-head" onClick={() => setOpenId(openId===m.id ? null : m.id)} style={{cursor:"pointer"}}>
+            <div>
+              <div className="metro-name">{m.name}</div>
+              <div className="metro-state">{m.state} · {m.population} · Median income {m.income}</div>
+              <div style={{marginTop:6, display:"flex", gap:8, flexWrap:"wrap", alignItems:"center"}}>
+                <span className={"terr-chip terr-" + cls}>
+                  {cls === "operating" ? "IN CURRENT FOOTPRINT" : cls === "adjacent" ? "CONTIGUOUS EXPANSION" : "NEW TERRITORY"}
+                </span>
+                {near && <span style={{fontSize:12, color:"#8FA6BC"}}>~{near.miles} mi from nearest Sila market ({near.name})</span>}
+              </div>
+            </div>
+            <div className="score-chip"><div className="n">{m.score}</div><div className="l">Target Score</div></div>
+          </div>
+          {openId === m.id && (
+            <div className="expand-body">
+              <div className="stat-row">
+                <div className="stat"><div className="k">Median Home Age</div><div className="v">{m.homeAge} yrs</div></div>
+                <div className="stat"><div className="k">Density</div><div className="v">{m.density}</div></div>
+                <div className="stat"><div className="k">Competitive Density</div><div className="v">{m.competitiveDensity}</div></div>
+                <div className="stat"><div className="k">Labor Drain Risk</div><div className="v">{m.laborDrain.split(" —")[0]}</div></div>
+              </div>
+              <div className="note-line"><span className="note-label">Housing / Siting</span>{m.builderEra}</div>
+              <div className="note-line"><span className="note-label">Adjacent Industry</span>{m.adjacentIndustry}</div>
+              <div className="note-line"><span className="note-label">Labor Market</span>{m.laborDrain}</div>
+              <div className="note-line"><span className="note-label">Margin Opportunity</span>{m.marginOpp}</div>
+              {m.incentiveFlag && <div className="flag">⚡ {m.incentiveFlag}</div>}
+              {nearestAnchor(m.id) && (
+                <div className="note-line"><span className="note-label">Footprint Proximity</span>
+                  Approximately {nearestAnchor(m.id).miles} miles from the nearest current Sila market ({nearestAnchor(m.id).name}) — distances are estimated against representative anchor markets, not the full brand directory.
+                </div>
+              )}
+              <div className="archetype-box"><strong>Illustrative acquisition archetype</strong> (not an actual company) — {m.archetype}</div>
+            </div>
+          )}
+        </div>
+      );})}
+    </div>
+  );
+}
+
+function MatchTab() {
+  const [commercial, setCommercial] = useState(30);
+  const [trades, setTrades] = useState(2);
+  const [multiLoc, setMultiLoc] = useState(false);
+
+  const ranked = useMemo(() => {
+    return METROS.map(m => {
+      let fit = 100 - Math.abs(commercial - m.commercialTilt);
+      fit -= Math.abs(trades - m.tradeDiversification) * 8;
+      if (multiLoc) {
+        fit += (m.consolidation === "High" ? 10 : m.consolidation === "Medium" ? 4 : -6);
+      } else {
+        fit += (m.consolidation === "Low" ? 6 : 0);
+      }
+      const blended = Math.round(fit * 0.5 + m.score * 0.5);
+      return { ...m, fit: Math.max(0, Math.min(100, blended)) };
+    }).sort((a,b) => b.fit - a.fit);
+  }, [commercial, trades, multiLoc]);
+
+  return (
+    <div>
+      <div className="card">
+        <div className="slider-block">
+          <div className="slider-label"><span>Residential ↔ Commercial mix</span><span>{commercial}% commercial</span></div>
+          <input type="range" min="0" max="100" value={commercial} onChange={e=>setCommercial(Number(e.target.value))} />
+          <div className="slider-ends"><span>All Residential</span><span>All Commercial</span></div>
+        </div>
+        <div className="slider-block">
+          <div className="slider-label"><span>Trade diversification</span><span>{trades === 1 ? "Single trade" : trades === 2 ? "Two trades" : "Three+ trades"}</span></div>
+          <input type="range" min="1" max="3" value={trades} onChange={e=>setTrades(Number(e.target.value))} />
+          <div className="slider-ends"><span>Single trade</span><span>Full multi-trade</span></div>
+        </div>
+        <div className="toggle-row" style={{marginBottom:0}}>
+          <button className={"pill-btn" + (!multiLoc ? " active":"")} onClick={()=>setMultiLoc(false)}>Single location</button>
+          <button className={"pill-btn" + (multiLoc ? " active":"")} onClick={()=>setMultiLoc(true)}>Multi-location roll-up</button>
+        </div>
+      </div>
+
+      <div style={{display:"flex", gap:12, flexWrap:"wrap", alignItems:"center", marginBottom:14}}>
+        <div className="sub" style={{marginBottom:0, flex:1}}>Metros ranked by fit to this profile — fit blends slider alignment with the underlying market target score.</div>
+        <button className="print-btn" onClick={() => {
+          const profile = `${commercial}% commercial mix · ${trades === 1 ? "Single trade" : trades === 2 ? "Two trades" : "Three+ trades"} · ${multiLoc ? "Multi-location roll-up" : "Single location"}`;
+          const body = `
+            <h2>Target Profile</h2><p>${profile}</p>
+            <h2>Ranked Shortlist</h2>
+            <table><tr><th>#</th><th>Metro</th><th>Fit Score</th><th>Market Score</th><th>Acquisition Archetype (illustrative)</th></tr>
+            ${ranked.map((m,i) => `<tr><td>${i+1}</td><td class="badge">${m.name}, ${m.state}</td><td class="badge">${m.fit}</td><td>${m.score}</td><td>${m.archetype}</td></tr>`).join("")}
+            </table>`;
+          openPrint("Target Matching Shortlist", body);
+        }}>🖨 Print Shortlist</button>
+      </div>
+      {ranked.map((m,i) => (
+        <div key={m.id} className="metro-card" style={{display:"flex", gap:16, alignItems:"flex-start"}}>
+          <div className="rank-num">{i+1}</div>
+          <div style={{flex:1}}>
+            <div className="metro-head">
+              <div>
+                <div className="metro-name" style={{fontSize:18}}>{m.name}, {m.state}</div>
+                <div className="metro-state">{m.population}</div>
+                <div style={{marginTop:6, display:"flex", gap:8, flexWrap:"wrap", alignItems:"center"}}>
+                  <span className={"terr-chip terr-" + stateExpansionClass(m.state)}>
+                    {stateExpansionClass(m.state) === "operating" ? "IN CURRENT FOOTPRINT" : stateExpansionClass(m.state) === "adjacent" ? "CONTIGUOUS EXPANSION" : "NEW TERRITORY"}
+                  </span>
+                  {nearestAnchor(m.id) && <span style={{fontSize:12, color:"#8FA6BC"}}>~{nearestAnchor(m.id).miles} mi from nearest Sila market</span>}
+                </div>
+              </div>
+              <div className="score-chip"><div className="n">{m.fit}</div><div className="l">Fit Score</div></div>
+            </div>
+            <div className="archetype-box">{m.archetype}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CompareTab() {
+  const [picked, setPicked] = useState(["OH","VA","NC"]);
+  const [query, setQuery] = useState("");
+  const [layers, setLayers] = useState({
+    rating:true, moat:true, licensing:true, incentive:true,
+    footprint:true, distributors:true, schools:true, metros:true
+  });
+  const LAYER_LABELS = {
+    rating:"M&A Rating", moat:"Licensing Moat", licensing:"Licensing Model", incentive:"Incentive Exposure",
+    footprint:"Footprint & Contiguity", distributors:"Distributor Coverage", schools:"Trade-School Pipeline", metros:"Sample Metros"
+  };
+  const byAbbr = Object.fromEntries(STATE_ROWS.map(s => [s.abbr, s]));
+  const suggestions = query.trim() === "" ? [] : STATE_ROWS.filter(s =>
+    !picked.includes(s.abbr) &&
+    (s.name.toLowerCase().includes(query.toLowerCase()) || s.abbr.toLowerCase() === query.trim().toLowerCase())
+  ).slice(0,5);
+  const addState = (abbr) => { if (picked.length < 4 && !picked.includes(abbr)) setPicked([...picked, abbr]); setQuery(""); };
+  const states = picked.map(a => byAbbr[a]).filter(Boolean);
+
+  const cellFor = (layer, s) => {
+    const cls = stateExpansionClass(s.abbr);
+    switch(layer){
+      case "rating": return <span className={"rating-badge rating-"+s.rating}>{s.rating}</span>;
+      case "moat": return <div><MoatBars moat={s.moat} /><div className="note-line" style={{marginTop:4}}>{MOAT_LABELS[s.moat]}</div></div>;
+      case "licensing": return s.licensing;
+      case "incentive": return s.incentive + (s.incentive === "High" ? " — underwrite incentive-dependent revenue explicitly" : "");
+      case "footprint": {
+        const opN = (NEIGHBORS[s.abbr]||[]).filter(n => OPERATING_STATES.includes(n));
+        return cls === "operating" ? "Current footprint — densification play"
+          : cls === "adjacent" ? `Contiguous expansion (borders ${opN.join(", ")})`
+          : "New territory — isolated regional entry";
+      }
+      case "distributors": {
+        const d = distributorsFor(s.abbr);
+        return `National coverage (${d.national.length})` + (d.regional.length ? ` + regional: ${d.regional.join(", ")}` : " — no major regional distributor density (sample)");
+      }
+      case "schools": return `~${TRADE_SCHOOLS[s.abbr].count} programs · ${TRADE_SCHOOLS[s.abbr].notable}`;
+      case "metros": {
+        const ms = METROS.filter(m => m.state === s.abbr);
+        return ms.length ? ms.map(m => `${m.name} (score ${m.score})`).join(" · ") : "No sample metro yet — add one to the data block";
+      }
+      default: return "";
+    }
+  };
+
+  const printCompare = () => {
+    const activeLayers = Object.keys(layers).filter(k => layers[k]);
+    const body = `
+      <h2>State Comparison — ${states.map(s=>s.name).join(" vs ")}</h2>
+      <table><tr><th>Layer</th>${states.map(s=>`<th>${s.name} (${s.abbr})</th>`).join("")}</tr>
+      ${activeLayers.map(l => `<tr><td class="badge">${LAYER_LABELS[l]}</td>${states.map(s=>{
+        const cls = stateExpansionClass(s.abbr);
+        let v = "";
+        if (l==="rating") v = s.rating;
+        else if (l==="moat") v = s.moat + "/5 — " + MOAT_LABELS[s.moat];
+        else if (l==="licensing") v = s.licensing;
+        else if (l==="incentive") v = s.incentive;
+        else if (l==="footprint") v = cls==="operating"?"Current footprint":cls==="adjacent"?"Contiguous expansion":"New territory";
+        else if (l==="distributors") { const d=distributorsFor(s.abbr); v = d.national.concat(d.regional).join(", "); }
+        else if (l==="schools") v = "~"+TRADE_SCHOOLS[s.abbr].count+" programs · "+TRADE_SCHOOLS[s.abbr].notable;
+        else if (l==="metros") v = METROS.filter(m=>m.state===s.abbr).map(m=>m.name+" ("+m.score+")").join(", ") || "—";
+        return `<td>${v}</td>`;
+      }).join("")}</tr>`).join("")}
+      </table>`;
+    openPrint("State Comparison", body);
+  };
+
+  return (
+    <div>
+      <div className="card">
+        <div className="note-label" style={{marginBottom:8}}>Compare up to 4 states</div>
+        <div style={{display:"flex", gap:8, flexWrap:"wrap", marginBottom:10}}>
+          {picked.map(a => (
+            <button key={a} className="pill-btn active" onClick={() => setPicked(picked.filter(p => p!==a))}>
+              {byAbbr[a] ? byAbbr[a].name : a} ✕
+            </button>
+          ))}
+        </div>
+        {picked.length < 4 && (
+          <div style={{position:"relative"}}>
+            <input type="text" placeholder="🔍 Add a state to the comparison…" value={query} onChange={e=>setQuery(e.target.value)} />
+            {suggestions.length > 0 && (
+              <div style={{marginTop:6, display:"flex", gap:8, flexWrap:"wrap"}}>
+                {suggestions.map(s => (
+                  <button key={s.abbr} className="pill-btn" onClick={()=>addState(s.abbr)}>{s.name}</button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        <div className="note-label" style={{margin:"16px 0 8px"}}>Layers to compare</div>
+        <div className="toggle-row" style={{marginBottom:0}}>
+          {Object.keys(LAYER_LABELS).map(k => (
+            <button key={k} className={"pill-btn" + (layers[k] ? " active":"")} onClick={()=>setLayers({...layers, [k]:!layers[k]})}>{LAYER_LABELS[k]}</button>
+          ))}
+        </div>
+      </div>
+
+      {states.length >= 2 ? (
+        <React.Fragment>
+          <div style={{display:"flex", justifyContent:"flex-end", marginBottom:10}}>
+            <button className="print-btn" onClick={printCompare}>🖨 Print Comparison</button>
+          </div>
+          <div style={{overflowX:"auto"}}>
+            <table style={{width:"100%", borderCollapse:"separate", borderSpacing:0, fontSize:13.5}}>
+              <thead>
+                <tr>
+                  <th style={{textAlign:"left", padding:"10px 12px", color:"#8FA6BC", fontSize:11.5, textTransform:"uppercase", letterSpacing:"0.5px"}}>Layer</th>
+                  {states.map(s => (
+                    <th key={s.abbr} style={{textAlign:"left", padding:"10px 12px", color:"#F4EEDD", fontFamily:"'DM Serif Display',serif", fontSize:17, fontWeight:400}}>
+                      {s.name}{OPERATING_STATES.includes(s.abbr) && <span className="fp-badge">FOOTPRINT</span>}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {Object.keys(LAYER_LABELS).filter(k => layers[k]).map(l => (
+                  <tr key={l}>
+                    <td style={{padding:"12px", color:"#8FA6BC", fontWeight:700, fontSize:12, textTransform:"uppercase", letterSpacing:"0.5px", borderTop:"1px solid rgba(255,255,255,0.08)", verticalAlign:"top", whiteSpace:"nowrap"}}>{LAYER_LABELS[l]}</td>
+                    {states.map(s => (
+                      <td key={s.abbr} style={{padding:"12px", color:"#C6D4E1", borderTop:"1px solid rgba(255,255,255,0.08)", verticalAlign:"top", lineHeight:1.5}}>{cellFor(l, s)}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </React.Fragment>
+      ) : (
+        <div className="card">Pick at least two states to compare.</div>
+      )}
+    </div>
+  );
+}
+
+function MethodTab() {
+  return (
+    <div>
+      {METHODOLOGY.map((s,i) => (
+        <div key={i} className="card">
+          <div className="method-title">{s.title}</div>
+          <div className="note-line">{s.body}</div>
+        </div>
+      ))}
+      <div className="card">
+        <div className="method-title">What it would take to productionize</div>
+        <ul style={{color:"#C6D4E1", fontSize:13.5, lineHeight:1.9, paddingLeft:20}}>
+          {PRODUCTIONIZE_NOTES.map((n,i) => <li key={i}>{n}</li>)}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [tab, setTab] = useState("home");
+  const [metroStateFilter, setMetroStateFilter] = useState(null);
+  const goToMetros = (stateAbbr) => { setMetroStateFilter(stateAbbr); setTab("metros"); };
+  const tabs = [
+    ["home","🏠 Start Here"],
+    ["states","📍 State Scorecard"],
+    ["compare","⚖ Compare States"],
+    ["metros","🏙 Market Drill-Down"],
+    ["match","🎚 Target Matching"],
+    ["method","💡 Methodology"]
+  ];
+  return (
+    <div className="wrap">
+      <style>{SS}</style>
+      <div className="top-row">
+        <div>
+          <div className="eyebrow">Sila Services · Mergers & Acquisitions</div>
+          <h1 className="title">M&A Market Navigator</h1>
+          <div className="sub">Territory expansion scorecard — regulatory moat, demographic siting, and labor-market dynamics</div>
+        </div>
+        <div className="badge-count">
+          <div className="num">50 <span style={{fontSize:18, color:"#9FB3C6"}}>/</span> 34</div>
+          <div className="lbl">states scored / sample metros</div>
+          <div className="pill-updated">● Updated {KB_LAST_UPDATED}</div>
+        </div>
+      </div>
+
+      <div className="disclaimer">⚠ {DISCLAIMER}</div>
+
+      <div className="tabs">
+        {tabs.map(([id,label]) => (
+          <div key={id} className={"tab" + (tab===id ? " active":"")} onClick={()=>setTab(id)}>{label}</div>
+        ))}
+      </div>
+
+      {tab === "home" && <StartHere goTo={(t) => { setMetroStateFilter(null); setTab(t); }} />}
+      {tab === "states" && <StatesTab goToMetros={goToMetros} />}
+      {tab === "compare" && <CompareTab />}
+      {tab === "metros" && <MetrosTab stateFilter={metroStateFilter} clearStateFilter={() => setMetroStateFilter(null)} />}
+      {tab === "match" && <MatchTab />}
+      {tab === "method" && <MethodTab />}
+
+      <div className="footer-note">Prototype built with Claude (Anthropic) · Sila Services L&D / M&A collaboration</div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

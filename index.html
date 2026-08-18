@@ -694,6 +694,27 @@ MT: "HEAR planning paused pending updated DOE guidance — no state program cush
 };
 STATE_ROWS.forEach(s => { if (INCENTIVE_NOTES[s.abbr]) { s.incentiveNote = INCENTIVE_NOTES[s.abbr]; s.incentiveVerified = true; } });
 
+
+// ============================================================
+// TARGET PIPELINE — public-source target intake
+// Schema: feed rows from Business Journal "Book of Lists" purchases,
+// D&B exports, license-database pulls, and worker scout runs.
+// Revenue/employee figures MUST carry their source label.
+// ============================================================
+const TARGET_SOURCE_STACK = [
+  { name: "Metro Business Journal 'Book of Lists'", cost: "~$50–$300/metro/yr", quality: "Highest public size data", detail: "Every American City Business Journals market (Philadelphia, Baltimore, Charlotte, Columbus Business First, Washington, etc.) publishes annual ranked lists of the largest HVAC/mechanical, plumbing, and electrical contractors with self-reported metro revenue, employee counts, and year founded. The Washington Business Journal mechanical-contractor list, for example, ranks by metro-area revenue with year-over-year figures. Buy the Book of Lists for each priority metro — it is the cheapest high-quality target census available." },
+  { name: "State license databases", cost: "Free", quality: "Verified entity + tenure", detail: "The licensing layer we verified doubles as a sourcing tool: Ohio eLicense, Virginia DPOR, Maryland HVACR Board, CT DCP, NJ Consumer Affairs and others expose searchable contractor rosters. A license-class + city query yields the full universe of legally operating contractors in a metro — with license tenure as a business-age proxy." },
+  { name: "Company websites", cost: "Free", quality: "Trades, footprint, ownership signals", detail: "Service pages confirm trade mix; 'since 19XX' and founder-story pages signal generation and succession posture; careers pages and fleet photos signal headcount; multiple location pages signal multi-branch operations." },
+  { name: "D&B public profiles", cost: "Free (basic) / subscription (full)", quality: "Modeled estimates — label as such", detail: "dnb.com exposes modeled revenue and employee estimates for most private companies. Useful for triage and cross-reference, but figures are algorithmic estimates — never treat them as verified. A D&B Hoovers subscription (or Grata / SourceScrub, which are purpose-built for private-company M&A sourcing) upgrades this layer if deal flow justifies it." },
+  { name: "Permit databases", cost: "Free–low", quality: "Install-volume proxy", detail: "BuildZoom, Shovels.ai, and municipal permit portals show permits pulled by contractor — the closest public proxy for actual install volume and commercial/residential mix." },
+  { name: "Industry rankings & local press", cost: "Free", quality: "Growth + succession signals", detail: "ACHR News rankings, Inc. 5000 appearances, 'fastest growing companies' lists, anniversary stories, and expansion articles surface both growth targets and owners talking publicly about the future of their business." }
+];
+
+const TARGETS = [
+  { name: "EXAMPLE — Buckeye Comfort Co.", metro: "Columbus, OH", trades: "HVAC + Plumbing", revBand: "$12–15M (Business Journal 2025 list: $13.4M)", employees: "~85 (BJ list)", founded: "1987 (OH eLicense: licensed 1989)", ownership: "2nd-generation family; founder semi-retired per website bio", confidence: "High", status: "Example row — replace", sources: "Columbus Business First Book of Lists 2025; company site; OH eLicense" },
+  { name: "EXAMPLE — Tidewater Mechanical", metro: "Richmond, VA", trades: "HVAC", revBand: "~$6M (D&B modeled estimate — unverified)", employees: "~40 (D&B estimate)", founded: "1998 (VA DPOR Class A since 2001)", ownership: "Founder-led; no succession signals found", confidence: "Medium", status: "Example row — replace", sources: "dnb.com profile; company site; VA DPOR lookup" }
+];
+
 // ---- Current Sila operating footprint (16 states) ----
 const OPERATING_STATES = ["CT","DE","GA","IL","MA","MD","ME","MI","NH","NJ","NY","OH","PA","VA","VT","WI"];
 
@@ -1543,6 +1564,59 @@ function CompareTab() {
   );
 }
 
+
+function TargetsTab() {
+  const confColor = c => c === "High" ? "#7EDB9C" : c === "Medium" ? "#E8C468" : "#E88968";
+  const printTargets = () => {
+    const rows = TARGETS.map(t => `<tr><td><strong>${t.name}</strong></td><td>${t.metro}</td><td>${t.trades}</td><td>${t.revBand}</td><td>${t.employees}</td><td>${t.founded}</td><td>${t.ownership}</td><td>${t.confidence}</td><td>${t.sources}</td></tr>`).join("");
+    openPrint("Target Pipeline", `<table><thead><tr><th>Company</th><th>Metro</th><th>Trades</th><th>Revenue (sourced)</th><th>Employees</th><th>Founded</th><th>Ownership</th><th>Confidence</th><th>Sources</th></tr></thead><tbody>${rows}</tbody></table><p style="margin-top:12px">All revenue and employee figures carry their source; estimates are labeled as estimates. Leads for human review — not vetted targets.</p>`);
+  };
+  return (
+    <div>
+      <div className="section-head">
+        <h2 className="section-title">🎯 Target Pipeline</h2>
+        <button className="print-btn" onClick={printTargets}>🖨 Print pipeline</button>
+      </div>
+      <div className="card">
+        <div className="method-title">How this pipeline gets fed — the public-source stack</div>
+        <div className="note-line">Every row in this pipeline is built by triangulating public sources, with every revenue and employee figure carrying its source label. The two example rows below show the schema. Three intake routes: (1) purchase the Business Journal Book of Lists for a priority metro and enter its ranked contractors here; (2) run "Scout Targets" in the Data &amp; Research tab — the research agent now triangulates business-journal lists, license databases, permit records, and D&amp;B public profiles automatically and returns rows in this format; (3) pull the license-database roster for a metro and enrich the names via websites and D&amp;B.</div>
+      </div>
+      <div className="grid2">
+        {TARGET_SOURCE_STACK.map((s,i) => (
+          <div className="card" key={i}>
+            <div style={{display:"flex", justifyContent:"space-between", gap:8, flexWrap:"wrap"}}>
+              <div className="method-title" style={{fontSize:15}}>{s.name}</div>
+              <span className="ver-badge" style={{marginLeft:0}}>{s.cost}</span>
+            </div>
+            <div style={{color:"#E8C468", fontSize:12, marginTop:2}}>{s.quality}</div>
+            <div className="note-line">{s.detail}</div>
+          </div>
+        ))}
+      </div>
+      <h2 className="section-title" style={{marginTop:20}}>Tracked targets ({TARGETS.length})</h2>
+      <div className="flag" style={{marginBottom:10}}>The rows below are EXAMPLES demonstrating the schema — replace them with real entries from Book of Lists purchases, D&amp;B exports, or scout runs. Rule of the pipeline: no revenue or employee figure enters without a source label, and D&amp;B figures are always marked as modeled estimates.</div>
+      {TARGETS.map((t,i) => (
+        <div className="card" key={i}>
+          <div style={{display:"flex", justifyContent:"space-between", gap:8, flexWrap:"wrap", alignItems:"flex-start"}}>
+            <div>
+              <div className="method-title" style={{fontSize:16}}>{t.name}</div>
+              <div style={{color:"#9FB3C6", fontSize:12}}>{t.metro} · {t.trades}</div>
+            </div>
+            <span className="ver-badge" style={{marginLeft:0, borderColor:confColor(t.confidence), color:confColor(t.confidence)}}>Confidence: {t.confidence}</span>
+          </div>
+          <div className="grid2" style={{marginTop:10}}>
+            <div className="stat"><div className="k">Revenue (sourced)</div><div className="v" style={{fontSize:13}}>{t.revBand}</div></div>
+            <div className="stat"><div className="k">Employees</div><div className="v" style={{fontSize:13}}>{t.employees}</div></div>
+            <div className="stat"><div className="k">Founded</div><div className="v" style={{fontSize:13}}>{t.founded}</div></div>
+            <div className="stat"><div className="k">Ownership signals</div><div className="v" style={{fontSize:13}}>{t.ownership}</div></div>
+          </div>
+          <div className="note-line" style={{marginTop:8}}><strong>Sources:</strong> {t.sources} · <strong>Status:</strong> {t.status}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function DataTab() {
   const [liveStatus, setLiveStatus] = useState(window.__LIVE_DATA_STATUS || "not present");
   const [task, setTask] = useState("refresh");
@@ -1668,6 +1742,7 @@ function App() {
     ["compare","⚖ Compare States"],
     ["metros","🏙 Market Drill-Down"],
     ["match","🎚 Target Matching"],
+    ["targets","🎯 Target Pipeline"],
     ["data","🔄 Data & Research"],
     ["method","💡 Methodology"]
   ];
@@ -1700,6 +1775,7 @@ function App() {
       {tab === "compare" && <CompareTab />}
       {tab === "metros" && <MetrosTab stateFilter={metroStateFilter} clearStateFilter={() => setMetroStateFilter(null)} />}
       {tab === "match" && <MatchTab />}
+      {tab === "targets" && <TargetsTab />}
       {tab === "data" && <DataTab />}
       {tab === "method" && <MethodTab />}
 

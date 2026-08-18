@@ -911,7 +911,8 @@ function openPrint(title, bodyHtml) {
     .disc{font-size:11px;color:#6a7a88;border:1px solid #c9d3dc;padding:8px 12px;margin:14px 0;background:#f7f9fb;}
     .badge{font-weight:bold;}
     .meta{font-size:11px;color:#6a7a88;margin-top:2px;}
-  </style></head><body>
+  </style>
+  </head><body>
   <h1>Sila Services — M&A Market Navigator · ${title}</h1>
   <div class="meta">Generated ${new Date().toLocaleDateString()} · Data updated ${KB_LAST_UPDATED}</div>
   <div class="disc">⚠ ${DISCLAIMER}</div>
@@ -1011,6 +1012,20 @@ const SS = `
   .terr-new { background:rgba(255,255,255,0.06); color:#AEBFCE; border:1px solid rgba(255,255,255,0.2); }
   .ver-badge { font-size:10px; font-weight:700; padding:3px 8px; border-radius:12px; background:rgba(94,196,120,0.15); color:#7EDB9C; border:1px solid rgba(94,196,120,0.4); margin-left:8px; white-space:nowrap; }
   .sample-badge { font-size:10px; font-weight:700; padding:3px 8px; border-radius:12px; background:rgba(255,255,255,0.05); color:#8FA6BC; border:1px solid rgba(255,255,255,0.15); margin-left:8px; white-space:nowrap; }
+
+/* ---- Research output: readability-first ---- */
+.research-output { margin-top:14px; background:#0E2033; border:1px solid rgba(232,196,104,0.25); border-radius:12px; padding:20px 22px; color:#DCE6F0; font-size:14.5px; line-height:1.65; }
+.research-output h2 { font-family:"DM Serif Display",serif; color:#E8C468; font-size:21px; margin:6px 0 10px; line-height:1.25; }
+.research-output h3 { font-family:"DM Serif Display",serif; color:#F2E3B8; font-size:17px; margin:18px 0 6px; padding-top:14px; border-top:1px solid rgba(159,179,198,0.15); }
+.research-output h4 { color:#E8C468; font-size:13px; text-transform:uppercase; letter-spacing:0.06em; margin:14px 0 4px; }
+.research-output p { margin:6px 0; }
+.research-output strong { color:#FFFFFF; font-weight:600; }
+.research-output em { color:#B9C9DA; }
+.research-output ul { margin:6px 0 10px 4px; padding-left:18px; }
+.research-output li { margin:4px 0; }
+.research-output hr { border:none; border-top:1px solid rgba(159,179,198,0.2); margin:16px 0; }
+.research-output code { background:rgba(232,196,104,0.12); color:#F2E3B8; padding:1px 6px; border-radius:5px; font-size:13px; }
+.research-output .research-note { background:rgba(232,137,104,0.12); border-left:3px solid #E88968; border-radius:0 8px 8px 0; padding:10px 14px; margin:10px 0; color:#F0DED6; font-size:13.5px; }
 `;
 
 function MoatBars({ moat }) {
@@ -1565,6 +1580,32 @@ function CompareTab() {
 }
 
 
+
+// Lightweight markdown renderer for research output — readability first
+function mdToHtml(md) {
+  const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const lines = esc(md).split("\n");
+  let out = [], inList = false;
+  const inline = t => t
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>")
+    .replace(/`([^`]+)`/g, "<code>$1</code>");
+  for (let raw of lines) {
+    const line = raw.trimEnd();
+    const t = line.trim();
+    const closeList = () => { if (inList) { out.push("</ul>"); inList = false; } };
+    if (t === "" ) { closeList(); continue; }
+    if (/^-{3,}$/.test(t)) { closeList(); out.push("<hr/>"); continue; }
+    let m;
+    if ((m = t.match(/^(#{1,4})\s+(.*)/))) { closeList(); const lvl = Math.min(m[1].length + 1, 4); out.push(`<h${lvl}>${inline(m[2])}</h${lvl}>`); continue; }
+    if ((m = t.match(/^(?:[-*•]|\d+\.)\s+(.*)/))) { if (!inList) { out.push("<ul>"); inList = true; } out.push(`<li>${inline(m[1])}</li>`); continue; }
+    if ((m = t.match(/^&gt;\s?(.*)/))) { closeList(); out.push(`<div class="research-note">${inline(m[1])}</div>`); continue; }
+    closeList(); out.push(`<p>${inline(t)}</p>`);
+  }
+  if (inList) out.push("</ul>");
+  return out.join("");
+}
+
 function TargetsTab() {
   const confColor = c => c === "High" ? "#7EDB9C" : c === "Medium" ? "#E8C468" : "#E88968";
   const printTargets = () => {
@@ -1700,7 +1741,7 @@ function DataTab() {
               <button className="print-btn" disabled={busy} onClick={runResearch}>{busy ? "Researching… (30–90 seconds)" : "▶ Run Research"}</button>
             </div>
             {err && <div className="flag" style={{marginTop:12}}>⚠ {err}</div>}
-            {result && <div className="expand-body" style={{whiteSpace:"pre-wrap", marginTop:12}}>{result}</div>}
+            {result && <div className="research-output" dangerouslySetInnerHTML={{__html: mdToHtml(result)}} />}
             <div className="note-line" style={{marginTop:12, fontSize:12, color:"#8FA6BC"}}>Research results are session-only unless the worker is configured to commit updates to data-live.json. Findings on specific companies are leads for human review, never a substitute for diligence.</div>
           </React.Fragment>
         ) : (

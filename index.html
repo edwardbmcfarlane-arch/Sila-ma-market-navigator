@@ -21,7 +21,7 @@
 
 const KB_LAST_UPDATED = "August 2026";
 
-const DISCLAIMER = "Data status is mixed: states marked ✓ VERIFIED have licensing data researched against state licensing authorities (Aug 2026); all other state figures and all metro demographics remain directional SAMPLE data. Validate unverified figures against licensing boards, Census/ACS data, and internal deal data before using this to inform an actual acquisition decision.";
+const DISCLAIMER = "Licensing layer: all 50 states verified Aug 2026 — 29 via direct licensing-authority research, 21 via comparative multi-state licensing databases (noted per state; spot-check before deal reliance). Metro demographics, incentive ratings, distributor coverage, and trade-school figures remain directional SAMPLE data pending the next verification phase.";
 
 // Licensing tiers, ranked as a proxy for "greenfield entry difficulty" —
 // higher moat = harder for a new competitor to stand up shop, which is
@@ -344,6 +344,270 @@ const METROS = [
 // August 2026. States not listed here remain SAMPLE data.
 // ============================================================
 const VERIFIED_STATES = {
+GA: {
+  licensing: "Statewide — Conditioned Air Contractor license (Construction Industry Licensing Board), Class I restricted / Class II unrestricted",
+  moat: 4, rating: "Favorable",
+  note: "VERIFIED with a moat upgrade: Georgia has required Conditioned Air Contractor licensing statewide since 1949 — Class I (restricted, ≤175K BTU heating / 60K BTU cooling) needs 4 years of W-2 documented experience under a licensed contractor (no 1099/sub work counts) plus board-approved design coursework; Class II (unrestricted) needs 5 years including large-system installs. Three notarized professional references required. Reported reciprocity with LA, SC, and TX — though SC-side sources conflict, so verify per board before relying on it. A stronger moat than sample data assumed, in Sila's southern anchor state.",
+  authority: "GA State Construction Industry Licensing Board / Div. of Conditioned Air Contractors", verifiedDate: "Aug 2026"
+},
+DE: {
+  licensing: "Statewide — Master HVACR / Master HVACR Restricted (Board of Plumbing, HVACR Examiners)",
+  moat: 4, rating: "Favorable",
+  note: "VERIFIED with a moat upgrade: Delaware requires a Master HVACR license (or Restricted single-specialty version) through a dedicated state board — journeyman certificate plus 2 years under a master, or 7 years under a master plus an apprenticeship-bypass exam, with a 75% passing threshold. Licensing runs from apprentice level up. Reciprocity exists with select states including Maryland (already in footprint). A small state with a real barrier.",
+  authority: "DE Board of Plumbing, HVACR Examiners (Div. of Professional Regulation)", verifiedDate: "Aug 2026"
+},
+WI: {
+  licensing: "No mandatory statewide HVAC license — voluntary DSPS HVAC Qualifier certification (4 yrs experience/education + exam)",
+  moat: 2, rating: "Favorable",
+  note: "VERIFIED with a moat downgrade: Wisconsin does not mandate HVAC licensing — the DSPS HVAC Qualifier credential (4 years of experience at 1,000+ hrs/yr or equivalent education, plus exam) is voluntary. Dwelling contractor certification and municipal permit rules apply, but the trade-level regulatory barrier is low. The Milwaukee position's defensibility rests on brand, permits, and the Mount Pleasant data-center labor dynamics rather than licensing.",
+  authority: "WI Dept. of Safety & Professional Services (voluntary qualifier)", verifiedDate: "Aug 2026"
+},
+ME: {
+  licensing: "No statewide HVAC license — oil/propane/solid-fuel heating licensed via Maine Fuel Board; heat pumps/AC largely unlicensed",
+  moat: 2, rating: "Watch",
+  note: "VERIFIED with an important nuance: Maine has no general HVAC license, but fuel-fired heating work (oil burners, propane/natural gas) requires Maine Fuel Board licensing — while heat pump and AC work is largely unlicensed at the state level. That asymmetry sharpens the incentive story: the Efficiency Maine-driven mini-split boom is happening in the LOW-barrier segment, meaning incentive-inflated revenue is also the segment easiest for new competitors to enter. Double reason to underwrite Maine conservatively.",
+  authority: "Maine Fuel Board (fuel-fired heating) / OPOR — no general HVAC authority", verifiedDate: "Aug 2026"
+},
+NH: {
+  licensing: "No statewide HVAC license — fuel gas fitters licensed via Mechanical Licensing Board; otherwise permits only",
+  moat: 2, rating: "Watch",
+  note: "VERIFIED: New Hampshire has no state HVAC contractor license — gas fitting requires Mechanical Licensing Board credentials, but general HVAC/heat-pump work needs only local permits and EPA 608. Combined with high electrification-incentive exposure, this confirms the double risk flag: incentive-dependent revenue in a low-barrier market. Same pattern as Maine.",
+  authority: "NH Mechanical Licensing Board (fuel gas only)", verifiedDate: "Aug 2026"
+},
+VT: {
+  licensing: "No statewide HVAC license — Residential Contractor Registration (OPR) for $10K+ jobs; fuel gas credentials separate",
+  moat: 2, rating: "Watch",
+  note: "VERIFIED: Vermont has no statewide HVAC trade license. Residential construction work of $10,000+ (including HVAC) requires Residential Contractor Registration with the Office of Professional Regulation, carrying $300K liability — a registration, not a competency barrier. Fuel gas work has its own credential. Third leg of the northern New England pattern: high Efficiency Vermont incentive exposure, low regulatory moat.",
+  authority: "VT Office of Professional Regulation (registration only)", verifiedDate: "Aug 2026"
+},
+RI: {
+  licensing: "Statewide — mechanical trades ladder (pipefitter / refrigeration / sheet metal: journeyperson → master → contractor classes)",
+  moat: 4, rating: "Watch",
+  note: "VERIFIED: Rhode Island licenses mechanical trades statewide through a structured ladder — refrigeration, pipefitting, and sheet metal each with journeyperson and master tiers (4,000-hour apprenticeships), contractor classes requiring 1–3 years at the preceding tier, and a Master Mechanical Contractor credential requiring 10 years as a licensed Master. Contractor registration is required for any project over $500. A genuinely strong small-state moat contiguous with CT and MA; Watch rating holds on market size and New England incentive exposure.",
+  authority: "RI Dept. of Labor & Training / Contractors' Registration & Licensing Board", verifiedDate: "Aug 2026"
+},
+AL: {
+  licensing: "Statewide — Board of Heating, Air Conditioning & Refrigeration Contractors; apprentices must also be certified",
+  moat: 3, rating: "Favorable",
+  note: "VERIFIED: Alabama requires statewide licensure through a dedicated HVAC board — contractors need 2 years of experience within the past 5 (or 3,000 education hours or an approved program) plus a 70% exam, and even apprentices must be certified with the board. Tennessee-side reciprocity exists (trade-exam waiver both directions). A solid uniform barrier in a state contiguous with Georgia.",
+  authority: "AL Board of Heating, Air Conditioning & Refrigeration Contractors", verifiedDate: "Aug 2026"
+},
+IA: {
+  licensing: "Statewide — Iowa Plumbing & Mechanical Systems Board (DIAL) licenses all HVAC workers; master required on-site",
+  moat: 3, rating: "Watch",
+  note: "VERIFIED with a moat upgrade: Iowa licenses ALL HVAC workers statewide through the Plumbing & Mechanical Systems Board — contractor and specialty tiers require exams and 24+ months of experience, a master-level technician must be associated with the business, and contractors must also register with Iowa Workforce Development with insurance proof. A stronger barrier than sample data assumed; Watch rating holds on modest demand catalysts, not regulation.",
+  authority: "Iowa Plumbing & Mechanical Systems Board (DIAL)", verifiedDate: "Aug 2026"
+},
+AZ: {
+  licensing: "Statewide — Registrar of Contractors (ROC): residential / commercial / dual HVAC classifications",
+  moat: 3, rating: "Favorable",
+  note: "VERIFIED (comparative sources): Arizona licenses HVAC contractors statewide through the ROC with residential, commercial, and dual classifications — 4 years of experience, dual exams, and class-based bonds. Trade-exam waiver available only for contractors licensed 5+ years in CA, NV, or UT; the Arizona statutes exam is always required. Confirms the moderate-moat, high-competition profile.",
+  authority: "Arizona Registrar of Contractors (ROC)", verifiedDate: "Aug 2026"
+},
+NV: {
+  licensing: "Statewide — C-21 Refrigeration & Air Conditioning license (Nevada State Contractors Board)",
+  moat: 4, rating: "Favorable",
+  note: "VERIFIED (comparative sources): Nevada requires a C-21 specialty license from the State Contractors Board — 4 years of relevant experience within the past 10, plus trade and business/law exams, with financial-responsibility review and bonding scaled to license limit. One of the tougher western boards. Strong moat confirmed.",
+  authority: "Nevada State Contractors Board", verifiedDate: "Aug 2026"
+},
+CA: {
+  licensing: "Statewide — CSLB C-20 Warm-Air Heating, Ventilating & AC license ($1,000+ jobs); $25K contractor bond",
+  moat: 4, rating: "Watch",
+  note: "VERIFIED (comparative sources): California requires the CSLB C-20 license for HVAC work on any job of $1,000 or more — 4 years of journeyman-level experience, trade plus law exams, and a $25,000 contractor bond. Reciprocal exam waivers limited to AZ, NV, and UT. Strong moat confirmed; Watch rating holds on Title 24 electrification mandates and incentive-driven system-mix volatility.",
+  authority: "CA Contractors State License Board (CSLB)", verifiedDate: "Aug 2026"
+},
+OR: {
+  licensing: "Statewide — Construction Contractors Board (CCB): commercial/residential classes + annual CE",
+  moat: 4, rating: "Watch",
+  note: "VERIFIED (comparative sources): Oregon licenses HVAC contractors statewide through the CCB with separate large-commercial, small-commercial, and residential classes, bonding ($15–20K), and 4 hours of annual continuing education. Strong moat confirmed; Watch holds on high electrification-incentive exposure.",
+  authority: "Oregon Construction Contractors Board (CCB)", verifiedDate: "Aug 2026"
+},
+WA: {
+  licensing: "Statewide layered — L&I specialty contractor registration ($15K bond) + 06A/06B electrical specialty certification (4,000/2,000 hrs + exam)",
+  moat: 3, rating: "Watch",
+  note: "VERIFIED (comparative sources) with a slight moat adjustment: Washington's structure is unusual — specialty contractor registration with L&I requires a $15,000 bond but no exam or experience, while the real competency gate is the 06A/06B electrical specialty certification HVAC techs need (4,000 hours + exam for 06A). A workforce-level barrier more than a contractor-level one. Watch holds on aggressive electrification policy.",
+  authority: "WA Dept. of Labor & Industries (L&I)", verifiedDate: "Aug 2026"
+},
+UT: {
+  licensing: "Statewide — DOPL S350 HVAC contractor license + 14 hrs CE per cycle",
+  moat: 3, rating: "Favorable",
+  note: "VERIFIED (comparative sources): Utah licenses HVAC contractors statewide through DOPL (S350 classification) with experience requirements, exams, bonding, and 14 hours of continuing education per 2-year cycle. Part of the AZ/NV/CA/UT reciprocal exam-waiver group. Moderate moat confirmed in a growing market.",
+  authority: "Utah DOPL", verifiedDate: "Aug 2026"
+},
+NM: {
+  licensing: "Statewide — Construction Industries Division: journeyman certificates + contractor licenses; $10K bond",
+  moat: 3, rating: "Watch",
+  note: "VERIFIED (comparative sources) with a moat upgrade: New Mexico licenses both journeymen (certificates of competence with training-hour requirements) and contractors statewide through the Construction Industries Division, with a $10,000 bond. A firmer barrier than sample data assumed; demand fundamentals remain modest.",
+  authority: "NM Regulation & Licensing Dept. / Construction Industries Division", verifiedDate: "Aug 2026"
+},
+OK: {
+  licensing: "Statewide — Construction Industries Board: mechanical apprentice / journeyman / contractor",
+  moat: 3, rating: "Favorable",
+  note: "VERIFIED (comparative sources) with a moat upgrade: Oklahoma licenses the mechanical trade statewide at apprentice, journeyman, and contractor levels through the Construction Industries Board — a license is required to install, repair, or service HVAC equipment in residential, commercial, and industrial settings. Firmer than sample data assumed.",
+  authority: "Oklahoma Construction Industries Board", verifiedDate: "Aug 2026"
+},
+AR: {
+  licensing: "Statewide — Dept. of Labor & Licensing: six HVACR license classifications",
+  moat: 3, rating: "Watch",
+  note: "VERIFIED (comparative sources) with a moat upgrade: Arkansas requires statewide HVACR licensure through the Dept. of Labor and Licensing with six classifications varying by scope, trade exams, insurance proof, and financial requirements. Tennessee-side reciprocity exists. A real barrier in a modest-demand market.",
+  authority: "Arkansas Dept. of Labor & Licensing", verifiedDate: "Aug 2026"
+},
+LA: {
+  licensing: "Statewide — State Licensing Board for Contractors: mechanical license for $10K+ work; parish/municipal overlays",
+  moat: 4, rating: "Favorable",
+  note: "VERIFIED (comparative sources): Louisiana requires a mechanical license from the State Licensing Board for Contractors for work of $10,000 or more, with exams, financial statements, and parish-level overlays on top. Reciprocity agreements exist with several states (incl. TN; GA-reported). Strong moat confirmed.",
+  authority: "Louisiana State Licensing Board for Contractors", verifiedDate: "Aug 2026"
+},
+MS: {
+  licensing: "State Board of Contractors licenses commercial/mechanical work; residential thresholds apply — lighter residential-service barrier",
+  moat: 2, rating: "Watch",
+  note: "VERIFIED (comparative sources): Mississippi's State Board of Contractors licenses commercial and mechanical contracting statewide (with TN trade-exam reciprocity for mechanical/electrical), but the residential service-and-replacement segment faces materially lighter requirements. Low effective moat for Sila's core segment; limited demand catalysts.",
+  authority: "Mississippi State Board of Contractors", verifiedDate: "Aug 2026"
+},
+AK: {
+  licensing: "Statewide — contractor registration + mechanical administrator requirements",
+  moat: 3, rating: "Watch",
+  note: "VERIFIED (comparative sources): Alaska requires statewide contractor registration with mechanical administrator credentials for HVAC scopes, plus bonding. Moderate barrier; the operating case remains dominated by logistics and market thinness rather than regulation.",
+  authority: "Alaska Div. of Corporations, Business & Professional Licensing", verifiedDate: "Aug 2026"
+},
+HI: {
+  licensing: "Statewide — DCCA Contractors License Board (C-52 ventilating/AC classification); comprehensive licensing system",
+  moat: 4, rating: "Watch",
+  note: "VERIFIED (comparative sources): Hawaii runs one of the most comprehensive contractor licensing systems in the country through the DCCA Contractors License Board — the C-52 classification covers ventilating and air conditioning with experience, exam, bonding, and financial requirements. Strong moat; island logistics remain the dominant operating factor.",
+  authority: "Hawaii DCCA Contractors License Board", verifiedDate: "Aug 2026"
+},
+ID: {
+  licensing: "Statewide — Division of Occupational & Professional Licenses: HVAC journeyman/contractor/specialty; broad reciprocity (13+ states)",
+  moat: 2, rating: "Favorable",
+  note: "VERIFIED (comparative sources): Idaho licenses HVAC statewide (journeyman via apprenticeship, contractor, and specialty tiers) — but offers reciprocity to license holders from 13+ states, which materially softens the barrier to entry. Net effective moat is modest despite the statewide structure. Boise-area demand fundamentals carry the rating.",
+  authority: "Idaho Division of Occupational & Professional Licenses", verifiedDate: "Aug 2026"
+},
+CO: {
+  licensing: "No statewide HVAC license — state licenses electrical/plumbing only; municipal HVAC licensing (Denver et al.)",
+  moat: 2, rating: "Watch",
+  note: "VERIFIED (comparative sources) with a moat downgrade: Colorado has no state HVAC license — DORA licenses electricians and plumbers, while HVAC licensing is municipal (Denver and other Front Range cities maintain their own). Low state-level moat; combined with heat-pump incentive dependency, underwrite Front Range entries carefully.",
+  authority: "Colorado DORA (electrical/plumbing only) + municipal boards", verifiedDate: "Aug 2026"
+},
+KS: {
+  licensing: "No statewide HVAC license — municipal licensing (Johnson County, Wichita, Topeka, KC-KS)",
+  moat: 2, rating: "Watch",
+  note: "VERIFIED (comparative sources): Kansas has no state HVAC license; metro counties and cities (Johnson County, Wichita, Topeka, Kansas City KS) run their own journeyman/contractor certifications. Metro-specific incumbency pattern, like Missouri across the state line.",
+  authority: "Municipal/county boards — no state HVAC authority", verifiedDate: "Aug 2026"
+},
+NE: {
+  licensing: "No statewide HVAC license — municipal (e.g., Omaha Air Control & Distribution licenses)",
+  moat: 2, rating: "Watch",
+  note: "VERIFIED (comparative sources): Nebraska issues no state HVAC license; Omaha requires its own Air Control and Distribution licenses and other cities vary. Low moat, low differentiation — confirms the sample assessment.",
+  authority: "Municipal boards — no state HVAC authority", verifiedDate: "Aug 2026"
+},
+ND: {
+  licensing: "No statewide HVAC license — state licenses plumbing/electrical; HVAC local/permit-based",
+  moat: 2, rating: "Watch",
+  note: "VERIFIED (comparative sources): North Dakota licenses plumbing and electrical statewide but not HVAC, which runs on local permits. Thin market, low barrier — confirms sample assessment.",
+  authority: "Local jurisdictions — no state HVAC authority", verifiedDate: "Aug 2026"
+},
+SD: {
+  licensing: "No statewide HVAC contractor license — local/permit-based",
+  moat: 2, rating: "Watch",
+  note: "VERIFIED (comparative sources): South Dakota has no statewide HVAC contractor license; regulation is local and permit-based. Confirms the low-differentiation sample profile.",
+  authority: "Local jurisdictions — no state HVAC authority", verifiedDate: "Aug 2026"
+},
+MT: {
+  licensing: "No state HVAC license — general contractor registration; trade regulation minimal",
+  moat: 2, rating: "Watch",
+  note: "VERIFIED (comparative sources): Montana has no HVAC trade license — technicians work under general contractor registration. Thin market, low barrier — confirms sample assessment.",
+  authority: "MT contractor registration — no HVAC trade authority", verifiedDate: "Aug 2026"
+},
+WY: {
+  licensing: "No state licensing — local permits only",
+  moat: 1, rating: "Caution",
+  note: "VERIFIED (comparative sources): Wyoming has no state contractor or HVAC licensing; only local permits apply. The weakest regulatory environment in the dataset paired with the thinnest population — Caution confirmed.",
+  authority: "Local permits only — no state authority", verifiedDate: "Aug 2026"
+},
+NJ: {
+  licensing: "Statewide — Master HVACR Contractor license (State Board of Examiners of HVACR Contractors, Div. of Consumer Affairs)",
+  moat: 5, rating: "Watch",
+  note: "VERIFIED: New Jersey requires a Master HVACR Contractor license for anyone performing HVACR contracting — one of the toughest paths in the country: minimum age 21, a 4-year DOL-approved apprenticeship plus a year of journeyperson experience under a licensed master (roughly 5 years total), dual PSI exams, $3,000 bond, and $500K liability insurance. Reciprocity is conditional and the Board has already ruled several states' licenses non-comparable. Board meets only monthly to approve applications. Very high moat confirmed; Watch rating holds for NJ Clean Energy incentive exposure and dense competition, not regulation.",
+  authority: "NJ State Board of Examiners of HVACR Contractors (Div. of Consumer Affairs)", verifiedDate: "Aug 2026"
+},
+NY: {
+  licensing: "No statewide HVAC license — municipal only (NYC DOB/FDNY, Buffalo, Syracuse, Rochester, Albany, Yonkers); most upstate counties permit-only",
+  moat: 4, rating: "Watch",
+  note: "VERIFIED with a correction: New York issues no statewide HVAC contractor license — one of the few large states without one. Licensing is entirely municipal: NYC has the most complex regime (split across DOB and FDNY with separate oil-burner, boiler, and refrigeration credentials), Buffalo requires a Heating Contractor license through its Board of Heating Examiners, and Syracuse/Rochester/Albany run their own — while most upstate counties require only building permits. So the moat is severely metro-concentrated: a 5 inside NYC, closer to a 2 upstate. Sila's Westchester and Buffalo positions hold exactly the credentials that matter.",
+  authority: "NYC DOB/FDNY + municipal boards (no state authority)", verifiedDate: "Aug 2026"
+},
+CT: {
+  licensing: "Statewide — DCP Heating, Piping & Cooling licensing at every level (S-1 contractor / S-2 journeyperson + 20 specialty classes)",
+  moat: 5, rating: "Watch",
+  note: "VERIFIED: Connecticut licenses ALL HVACR work at every level through the Dept. of Consumer Protection — apprentices must register (8,000 hours OJT + 720 classroom hours over 4 years), journeypersons (S-2) must complete the apprenticeship and pass an exam, and contractors (S-1) need two additional years as a journeyperson plus trade and business/law exams, across 20+ specialty license classes. Roughly a 6-year pipeline to contractor status: one of the strongest moats in the country, statute-backed (CGS 20-330). Watch rating holds for Energize CT incentive exposure.",
+  authority: "CT Dept. of Consumer Protection / Heating, Piping, Cooling & Sheet Metal Examining Board", verifiedDate: "Aug 2026"
+},
+MD: {
+  licensing: "Statewide — HVACR Board licenses every level (apprentice→journeyman→master) + county overlays (Anne Arundel, Prince George's)",
+  moat: 4, rating: "Watch",
+  note: "VERIFIED: Maryland licenses all HVACR work from the apprentice level up through a dedicated state board — journeyman requires 3+ years as a licensed apprentice with 1,875+ training hours, master requires 3 more years as a journeyman — and Anne Arundel and Prince George's counties require a county HVACR license ON TOP of the state license. Reciprocity is limited to Delaware and Virginia (both already Sila states — convenient for cross-state tech mobility within the footprint). Strong layered moat confirmed.",
+  authority: "MD Board of HVACR Contractors (Dept. of Labor) + county boards", verifiedDate: "Aug 2026"
+},
+IL: {
+  licensing: "No state HVAC license (state licenses plumbing/roofing only) — municipal regimes vary; Chicago requires GC license for permitted work + city electrical/refrigeration credentials",
+  moat: 2, rating: "Favorable",
+  note: "CORRECTED with a significant moat downgrade: earlier sample data assumed a strong Chicago municipal HVAC licensing layer, but Illinois has no statewide HVAC license — the state licenses only plumbing (IDPH) and roofing (IDFPR) — and even Chicago issues no HVAC-specific contractor license; permitted work there runs through the city's General Contractor license classes (with insurance requirements up to $5M for Class A) plus city-specific electrical and refrigeration credentials for those scopes. Home-rule municipalities each set their own rules. The effective moat is low; Chicago incumbency value comes from permit relationships and insurance scale rather than trade licensing.",
+  authority: "IDPH (plumbing) / IDFPR (roofing) / Chicago Dept. of Buildings — no state HVAC authority", verifiedDate: "Aug 2026"
+},
+MI: {
+  licensing: "Statewide — Mechanical Contractor license via LARA Bureau of Construction Codes (Skilled Trades Regulation Act, PA 407 of 2016)",
+  moat: 3, rating: "Favorable",
+  note: "VERIFIED: Michigan requires a Mechanical Contractor license from LARA's Bureau of Construction Codes for HVAC work statewide — 3 years / 6,000 hours of experience in the specific classification (up to 2,000 hours creditable from accredited training), PSI exams per classification (HVAC equipment, heating service, refrigeration/AC, ductwork), and a licensed qualifying officer for the business entity. Local municipalities add permits but cannot override state licensing. A real, uniform statewide barrier — moderate moat confirmed.",
+  authority: "MI Dept. of Licensing & Regulatory Affairs (LARA) / Bureau of Construction Codes", verifiedDate: "Aug 2026"
+},
+IN: {
+  licensing: "No statewide HVAC license — plumbing state-licensed (IPLA); HVAC/electrical municipal (Indianapolis BNS, Fort Wayne, Evansville, South Bend)",
+  moat: 2, rating: "Favorable",
+  note: "VERIFIED with a moat downgrade: Indiana issues no statewide HVAC license — plumbing is the only trade licensed statewide (Indiana Plumbing Commission/IPLA), while HVAC and electrical licensing is delegated to cities and counties, each a separate jurisdiction (an Indianapolis license doesn't cover Fort Wayne). No reciprocity exists because there's nothing statewide to reciprocate. Like Pennsylvania, the moat is metro-specific: real inside Indianapolis/Marion County's BNS licensing regime, thin elsewhere. Demand fundamentals (data-center corridor, logistics hub) carry the Favorable rating.",
+  authority: "Indiana Plumbing Commission (IPLA) + municipal boards (Indianapolis BNS et al.)", verifiedDate: "Aug 2026"
+},
+KY: {
+  licensing: "Statewide — DHBC licenses HVAC (apprentice/journeyman/master), electrical, and plumbing through separate divisions",
+  moat: 4, rating: "Favorable",
+  note: "VERIFIED with a moat upgrade: Kentucky licenses HVAC at every level statewide through the Dept. of Housing, Buildings and Construction — even apprentices must register, journeymen need 3,000 hours plus exam, and master contractors need two years as a journeyman plus exam, $500K liability, and workers' comp. Electrical and plumbing are also state-licensed via DHBC divisions. HVAC reciprocity is narrow (Ohio master license accepted for exam waiver). A genuinely strong, statute-backed barrier (KRS 198B.650) in a market contiguous with the Ohio position.",
+  authority: "KY Dept. of Housing, Buildings & Construction (DHBC)", verifiedDate: "Aug 2026"
+},
+SC: {
+  licensing: "Statewide — LLR Contractor's Licensing Board (commercial mechanical) + Residential Builders Commission (residential HVAC)",
+  moat: 4, rating: "Favorable",
+  note: "VERIFIED with a moat upgrade: South Carolina requires licensure at very low thresholds — residential HVAC work over $500 requires a Residential Builders Commission license, and commercial mechanical work runs through the LLR Contractor's Licensing Board with class-based groups, surety bonds ($10K residential; $7K–$300K commercial by class), dual PSI exams, and 4 years of documented journeyman experience for mechanical contractors. Critically, SC has no reciprocity — a licensed Georgia or North Carolina contractor must meet SC requirements independently. Strong barrier in a growing I-85 corridor market contiguous with Georgia.",
+  authority: "SC LLR Contractor's Licensing Board + Residential Builders Commission", verifiedDate: "Aug 2026"
+},
+MO: {
+  licensing: "No statewide HVAC/mechanical license (statewide electrical only via OSEC) — Kansas City and St. Louis run independent municipal licensing",
+  moat: 3, rating: "Favorable",
+  note: "VERIFIED with a correction: Missouri has no statewide HVAC or mechanical license — the Statewide Mechanical Contractor Licensing Act (SB 31) has repeatedly failed to pass, most recently dying in the 2025 session. Only electrical contractors are licensed statewide (OSEC). Kansas City requires a contractor license plus trade Certificate of Qualification (7,500 documented hours for mechanical), and St. Louis city/county run their own programs; credentials do not transfer between cities. So the moat concentrates exactly where the metros are — KC and STL incumbency is defensible, the rest of the state is open field.",
+  authority: "MO Division of Professional Registration (electrical only) + KC/STL municipal boards", verifiedDate: "Aug 2026"
+},
+MN: {
+  licensing: "No state license — $25K mechanical contractor bond filed with DLI (Minn. Stat. 326B.197) + municipal competency cards (Minneapolis/St. Paul)",
+  moat: 2, rating: "Favorable",
+  note: "VERIFIED with a moat downgrade: Minnesota has no state-level mechanical contractor or technician license — the statewide requirement is a $25,000 bond filed with the Dept. of Labor and Industry, which any surety writes for a couple hundred dollars. The real credentialing lives at the city level: Minneapolis and St. Paul require journeyman/master competency cards (with reciprocity between the two cities). A modest barrier overall; underwrite Twin Cities incumbency, not state regulation. Demand fundamentals (harsh-climate replacement economics, Rosemount data-center build) hold the Favorable rating.",
+  authority: "MN Dept. of Labor & Industry (bond) + Minneapolis/St. Paul competency boards", verifiedDate: "Aug 2026"
+},
+WV: {
+  licensing: "Statewide two-tier — universal individual HVAC Technician Certification (Division of Labor) + contractor license ($2,500+ any trade; $5K residential / $25K commercial HVAC)",
+  moat: 3, rating: "Watch",
+  note: "VERIFIED: West Virginia requires every individual performing HVAC work to hold a Technician Certification from the Division of Labor — effective since 2016 with no exemptions for job size, requiring 2,000 hours of experience plus exam. Businesses additionally need a Contractor License once projects exceed $5,000 residential / $25,000 commercial (and $2,500 for general trades). Universal individual certification is a real workforce-level barrier that also matters for M&A diligence: every tech on an acquired team must hold current certification. Watch rating holds on limited demand catalysts, not regulation.",
+  authority: "WV Division of Labor / Contractor Licensing Board", verifiedDate: "Aug 2026"
+},
+PA: {
+  licensing: "No statewide trade license — HICPA registration (AG) + ~30 municipal licensing programs (Philadelphia L&I, Pittsburgh/Allegheny Co.)",
+  moat: 3, rating: "Favorable",
+  note: "VERIFIED with nuance: Pennsylvania has no statewide HVAC contractor license. Home improvement contractors doing $5K+/yr must register under HICPA with the Attorney General, and roughly 30 municipalities run their own licensing — Philadelphia's L&I requires mechanical/warm-air/gas-fitting licenses plus a Commercial Activity License, and Pittsburgh/Allegheny County maintain their own schemes. Net effect: the moat is metro-specific — strong inside Philadelphia and Pittsburgh where Sila already holds municipal credentials, weak in the townships between them. Incumbency in the two big metros is the defensible asset.",
+  authority: "PA Attorney General (HICPA) + municipal L&I departments", verifiedDate: "Aug 2026"
+},
+MA: {
+  licensing: "No unified HVAC license — multi-board system: Pipefitters/Refrigeration bureau, Sheet Metal Workers board, Plumbers & Gas Fitters board, Electricians board",
+  moat: 5, rating: "Watch",
+  note: "VERIFIED: Massachusetts fragments HVAC work across separate licensing boards — refrigeration licenses (required for 10+ ton systems) under the Bureau of Pipefitters/Refrigeration Technicians/Sprinkler Fitters, ductwork under the Sheet Metal Workers board, gas-fired heating under Plumbers & Gas Fitters, and electrical under its own board — with essentially no reciprocity with other states. Assembling a compliant multi-trade operation from scratch means clearing three or four separate board regimes: one of the strongest effective moats in the country. Watch rating holds for Mass Save incentive-cycle exposure, not regulatory risk.",
+  authority: "MA Division of Occupational Licensure (multiple boards)", verifiedDate: "Aug 2026"
+},
 TX: {
   licensing: "State trade licenses (TDLR: HVAC/ACR + Electrical; TSBPE: Plumbing) — no GC license",
   moat: 3, rating: "Watch",
@@ -382,6 +646,29 @@ VA: {
 }
 };
 STATE_ROWS.forEach(s => { if (VERIFIED_STATES[s.abbr]) Object.assign(s, VERIFIED_STATES[s.abbr], { verified: true }); });
+
+
+// ============================================================
+// LIVE DATA & RESEARCH CONFIG
+// ============================================================
+// Optional: URL of a deployed research worker (Cloudflare Worker
+// or Azure Function) that proxies the Anthropic API with web
+// search. Leave "" to show setup instructions in the tool.
+const RESEARCH_WORKER_URL = "";
+
+// The app attempts to load data-live.json from the same repo at
+// startup. If present, its contents override the embedded data
+// below and its timestamp shows in the Data Status panel. This is
+// how automated refreshes persist: the worker commits a new
+// data-live.json to GitHub, and Pages redeploys it.
+const DATA_DOMAINS = [
+  { key:"licensing", label:"State licensing & moat", source:"State licensing boards (web-verified)", status:"50 of 50 verified (29 deep-dive, 21 comparative)", updated:"Aug 2026" },
+  { key:"incentives", label:"Incentive exposure ratings", source:"Sample — directional", status:"Sample", updated:"Aug 2026" },
+  { key:"metros", label:"Metro demographics (34 metros)", source:"Sample — Census/ACS planned", status:"Sample", updated:"Aug 2026" },
+  { key:"anchors", label:"Sila footprint anchors (distance calc)", source:"19 representative anchors — full 45-brand directory planned", status:"Representative", updated:"Aug 2026" },
+  { key:"distributors", label:"Distributor coverage", source:"Modeled from public branch networks", status:"Sample", updated:"Aug 2026" },
+  { key:"schools", label:"Trade-school pipeline", source:"Directional counts + flagship programs", status:"Sample", updated:"Aug 2026" }
+];
 
 // ---- Current Sila operating footprint (16 states) ----
 const OPERATING_STATES = ["CT","DE","GA","IL","MA","MD","ME","MI","NH","NJ","NY","OH","PA","VA","VT","WI"];
@@ -754,10 +1041,20 @@ function USTileMap({ mode, selected, onSelect }) {
                 fill={fill}
                 stroke={isSel ? "#F4EEDD" : (isOp && mode !== "footprint" ? "#E8C468" : "rgba(255,255,255,0.12)")}
                 strokeWidth={isSel ? 3 : (isOp && mode !== "footprint" ? 2 : 1)} />
-              <text x={c*(CELL+GAP)+CELL/2} y={r*(CELL+GAP)+CELL/2+1} textAnchor="middle" dominantBaseline="middle"
-                fontSize="14" fontWeight="700" fontFamily="DM Sans, sans-serif"
+              <text x={c*(CELL+GAP)+CELL/2} y={r*(CELL+GAP)+CELL/2-3} textAnchor="middle" dominantBaseline="middle"
+                fontSize="13" fontWeight="700" fontFamily="DM Sans, sans-serif"
                 fill={mode==="footprint" && cls==="new" ? "#7A93A9" : "#0A1826"}
                 style={{pointerEvents:"none"}}>{abbr}</text>
+              {s.verified ? (
+                <text x={c*(CELL+GAP)+CELL/2} y={r*(CELL+GAP)+CELL-10} textAnchor="middle"
+                  fontSize="10" fontWeight="700" fontFamily="DM Sans, sans-serif"
+                  fill={mode==="footprint" && cls==="new" ? "#7EDB9C" : "#0A1826"}
+                  style={{pointerEvents:"none"}}>✓</text>
+              ) : (
+                <circle cx={c*(CELL+GAP)+CELL/2} cy={r*(CELL+GAP)+CELL-13} r="1.8"
+                  fill={mode==="footprint" && cls==="new" ? "#4A6076" : "rgba(10,24,38,0.4)"}
+                  style={{pointerEvents:"none"}} />
+              )}
               {isOp && mode !== "footprint" && (
                 <circle cx={c*(CELL+GAP)+CELL-8} cy={r*(CELL+GAP)+8} r="3.5" fill="#0A1826" stroke="#E8C468" strokeWidth="1.5" style={{pointerEvents:"none"}} />
               )}
@@ -771,6 +1068,7 @@ function USTileMap({ mode, selected, onSelect }) {
             <span className="leg-item"><span className="leg-swatch" style={{background:FOOTPRINT_COLORS.operating}}></span> Current footprint (16 states)</span>
             <span className="leg-item"><span className="leg-swatch" style={{background:FOOTPRINT_COLORS.adjacent}}></span> Adjacent — contiguous expansion</span>
             <span className="leg-item"><span className="leg-swatch" style={{background:FOOTPRINT_COLORS.new, border:"1px solid rgba(255,255,255,0.2)"}}></span> New territory</span>
+            <span className="leg-item"><span style={{color:"#7EDB9C", fontWeight:700}}>✓</span> = licensing verified · <span style={{color:"#8FA6BC"}}>•</span> = sample data</span>
           </React.Fragment>
         ) : (
           <React.Fragment>
@@ -778,6 +1076,7 @@ function USTileMap({ mode, selected, onSelect }) {
             <span className="leg-item"><span className="leg-swatch" style={{background:RATING_COLORS.Watch}}></span> Watch</span>
             <span className="leg-item"><span className="leg-swatch" style={{background:RATING_COLORS.Caution}}></span> Caution</span>
             <span className="leg-item"><span className="leg-swatch" style={{background:"transparent", border:"2px solid #E8C468"}}></span> Gold ring = current Sila state</span>
+            <span className="leg-item"><span style={{fontWeight:700}}>✓</span> = licensing verified · <span style={{color:"#8FA6BC"}}>•</span> = sample data</span>
           </React.Fragment>
         )}
       </div>
@@ -1208,6 +1507,102 @@ function CompareTab() {
   );
 }
 
+function DataTab() {
+  const [liveStatus, setLiveStatus] = useState(window.__LIVE_DATA_STATUS || "not present");
+  const [task, setTask] = useState("refresh");
+  const [stateSel, setStateSel] = useState("PA");
+  const [scoutMetro, setScoutMetro] = useState(METROS[0].id);
+  const [scoutProfile, setScoutProfile] = useState("Residential-heavy HVAC & Plumbing combo, $5M–$15M revenue, family-owned, 10+ years operating");
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState(null);
+  const [err, setErr] = useState(null);
+
+  const runResearch = async () => {
+    if (!RESEARCH_WORKER_URL) return;
+    setBusy(true); setErr(null); setResult(null);
+    try {
+      const payload = task === "refresh"
+        ? { task: "refresh-state", state: stateSel }
+        : { task: "scout-targets", metro: METROS.find(m => m.id === scoutMetro), profile: scoutProfile };
+      const r = await fetch(RESEARCH_WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (!r.ok) throw new Error("Worker returned " + r.status);
+      const data = await r.json();
+      setResult(data.report || JSON.stringify(data, null, 2));
+    } catch (e) {
+      setErr(String(e));
+    }
+    setBusy(false);
+  };
+
+  return (
+    <div>
+      <div className="card">
+        <div className="method-title">Data Status</div>
+        <div className="note-line" style={{marginBottom:12}}>Every data domain in this tool carries its own status. Live file (data-live.json): <strong style={{color: liveStatus === "loaded" ? "#7EDB9C" : "#E8C468"}}>{liveStatus}</strong></div>
+        <div style={{overflowX:"auto"}}>
+          <table style={{width:"100%", borderCollapse:"collapse", fontSize:13}}>
+            <thead><tr>
+              {["Data Domain","Source","Status","Last Updated"].map(h => <th key={h} style={{textAlign:"left", padding:"8px 10px", color:"#8FA6BC", fontSize:11, textTransform:"uppercase", letterSpacing:"0.5px", borderBottom:"1px solid rgba(255,255,255,0.1)"}}>{h}</th>)}
+            </tr></thead>
+            <tbody>
+              {DATA_DOMAINS.map(d => (
+                <tr key={d.key}>
+                  <td style={{padding:"9px 10px", color:"#E7EDF3", fontWeight:600, borderBottom:"1px solid rgba(255,255,255,0.06)"}}>{d.label}</td>
+                  <td style={{padding:"9px 10px", color:"#C6D4E1", borderBottom:"1px solid rgba(255,255,255,0.06)"}}>{d.source}</td>
+                  <td style={{padding:"9px 10px", borderBottom:"1px solid rgba(255,255,255,0.06)"}}>
+                    <span className={/verified/i.test(d.status) ? "ver-badge" : "sample-badge"} style={{marginLeft:0}}>{d.status}</span>
+                  </td>
+                  <td style={{padding:"9px 10px", color:"#8FA6BC", borderBottom:"1px solid rgba(255,255,255,0.06)"}}>{d.updated}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="method-title">Live Research</div>
+        {RESEARCH_WORKER_URL ? (
+          <React.Fragment>
+            <div className="toggle-row">
+              <button className={"pill-btn" + (task==="refresh" ? " active":"")} onClick={()=>setTask("refresh")}>🔄 Refresh a State's Data</button>
+              <button className={"pill-btn" + (task==="scout" ? " active":"")} onClick={()=>setTask("scout")}>🔎 Scout Targets in a Metro</button>
+            </div>
+            {task === "refresh" ? (
+              <div style={{maxWidth:340}}>
+                <select value={stateSel} onChange={e=>setStateSel(e.target.value)}>
+                  {STATE_ROWS.map(s => <option key={s.abbr} value={s.abbr}>{s.name}{s.verified ? " (verified " + s.verifiedDate + ")" : " (sample)"}</option>)}
+                </select>
+              </div>
+            ) : (
+              <div className="grid2">
+                <select value={scoutMetro} onChange={e=>setScoutMetro(e.target.value)}>
+                  {METROS.map(m => <option key={m.id} value={m.id}>{m.name}, {m.state}</option>)}
+                </select>
+                <input type="text" value={scoutProfile} onChange={e=>setScoutProfile(e.target.value)} placeholder="Target profile description…" />
+              </div>
+            )}
+            <div style={{marginTop:14}}>
+              <button className="print-btn" disabled={busy} onClick={runResearch}>{busy ? "Researching… (30–90 seconds)" : "▶ Run Research"}</button>
+            </div>
+            {err && <div className="flag" style={{marginTop:12}}>⚠ {err}</div>}
+            {result && <div className="expand-body" style={{whiteSpace:"pre-wrap", marginTop:12}}>{result}</div>}
+            <div className="note-line" style={{marginTop:12, fontSize:12, color:"#8FA6BC"}}>Research results are session-only unless the worker is configured to commit updates to data-live.json. Findings on specific companies are leads for human review, never a substitute for diligence.</div>
+          </React.Fragment>
+        ) : (
+          <div className="note-line">
+            Live research isn't connected yet. This panel activates when a research worker endpoint is deployed and its URL is set in the <strong>RESEARCH_WORKER_URL</strong> constant at the top of this file's data block. The worker (same Cloudflare Worker pattern as the GM Success Coach) proxies the Anthropic API with web search enabled, powering two tasks from this panel: refreshing a state's licensing/incentive data on demand, and scouting acquisition-candidate companies in a chosen metro against a written target profile. Once deployed, results appear here with timestamps, and the worker can optionally commit refreshed data back to this repo as data-live.json — which makes updates permanent and shows "loaded" in the Data Status panel above.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function MethodTab() {
   return (
     <div>
@@ -1237,6 +1632,7 @@ function App() {
     ["compare","⚖ Compare States"],
     ["metros","🏙 Market Drill-Down"],
     ["match","🎚 Target Matching"],
+    ["data","🔄 Data & Research"],
     ["method","💡 Methodology"]
   ];
   return (
@@ -1249,8 +1645,8 @@ function App() {
           <div className="sub">Territory expansion scorecard — regulatory moat, demographic siting, and labor-market dynamics</div>
         </div>
         <div className="badge-count">
-          <div className="num">50 <span style={{fontSize:18, color:"#9FB3C6"}}>/</span> 34</div>
-          <div className="lbl">states scored / sample metros</div>
+          <div className="num">50<span style={{fontSize:16, color:"#7EDB9C"}}>{"\u2713"}</span> <span style={{fontSize:18, color:"#9FB3C6"}}>/</span> 34</div>
+          <div className="lbl">states verified / sample metros</div>
           <div className="pill-updated">● Updated {KB_LAST_UPDATED}</div>
         </div>
       </div>
@@ -1268,6 +1664,7 @@ function App() {
       {tab === "compare" && <CompareTab />}
       {tab === "metros" && <MetrosTab stateFilter={metroStateFilter} clearStateFilter={() => setMetroStateFilter(null)} />}
       {tab === "match" && <MatchTab />}
+      {tab === "data" && <DataTab />}
       {tab === "method" && <MethodTab />}
 
       <div className="footer-note">Prototype built with Claude (Anthropic) · Sila Services L&D / M&A collaboration</div>
@@ -1275,7 +1672,34 @@ function App() {
   );
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+async function boot() {
+  // Attempt to load data-live.json (committed by the research worker).
+  // Overrides embedded data when present; silently falls back otherwise.
+  try {
+    const r = await fetch("data-live.json", { cache: "no-store" });
+    if (r.ok) {
+      const live = await r.json();
+      if (live.verifiedStates) {
+        STATE_ROWS.forEach(s => {
+          if (live.verifiedStates[s.abbr]) Object.assign(s, live.verifiedStates[s.abbr], { verified: true });
+        });
+      }
+      if (live.anchors && Array.isArray(live.anchors)) {
+        SILA_ANCHORS.length = 0;
+        live.anchors.forEach(a => SILA_ANCHORS.push(a));
+      }
+      if (live.dataDomains) {
+        live.dataDomains.forEach(upd => {
+          const d = DATA_DOMAINS.find(x => x.key === upd.key);
+          if (d) Object.assign(d, upd);
+        });
+      }
+      window.__LIVE_DATA_STATUS = "loaded (updated " + (live.updated || "unknown") + ")";
+    }
+  } catch (e) { /* no live file — embedded data stands */ }
+  ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+}
+boot();
 </script>
 </body>
 </html>

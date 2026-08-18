@@ -21,7 +21,7 @@
 
 const KB_LAST_UPDATED = "August 2026";
 
-const DISCLAIMER = "Licensing layer: all 50 states verified Aug 2026 — 29 via direct licensing-authority research, 21 via comparative multi-state licensing databases (noted per state; spot-check before deal reliance). Metro demographics, incentive ratings, distributor coverage, and trade-school figures remain directional SAMPLE data pending the next verification phase.";
+const DISCLAIMER = "Licensing layer: all 50 states verified Aug 2026 — 29 via direct licensing-authority research, 21 via comparative multi-state licensing databases (noted per state; spot-check before deal reliance). Incentive layer verified Aug 2026 (federal OBBBA changes + 9 key state programs). Metro incomes verified for 26 of 34 metros (ACS/Atlanta Fed) and median home ages for 18 of 34 (ACS 2024). National distributor networks and the F.W. Webb Northeast footprint verified from company sources. Remaining SAMPLE data: competitive density, builder-era narratives, smaller-metro demographics, regional distributor branch detail, and trade-school counts.";
 
 // Licensing tiers, ranked as a proxy for "greenfield entry difficulty" —
 // higher moat = harder for a new competitor to stand up shop, which is
@@ -92,19 +92,19 @@ const STATE_ROWS = [
 // Chosen to span the patterns discussed: aging tract-housing stock,
 // data-center-driven labor competition, and New England incentive volatility.
 const METROS = [
-{ id:"charlotte", name:"Charlotte", state:"NC", population:"2.8M metro", income:"$72K", homeAge:22,
+{ id:"charlotte", ageVerified:true, demoVerified:true, name:"Charlotte", state:"NC", population:"2.8M metro", income:"$91K", homeAge:26,
   builderEra:"1995–2010 national-builder tract subdivisions ringing the metro core",
   density:"Medium-High", competitiveDensity:"Medium (~24 multi-trade operators $5M+ revenue)",
   adjacentIndustry:"Financial-services and logistics growth, with moderate data-center activity just south of the metro in Rock Hill/York Co., SC.",
   laborDrain:"Low", marginOpp:"Medium", commercialTilt:35, tradeDiversification:2, consolidation:"Medium",
   score:78, archetype:"1–2 location residential-heavy HVAC & Plumbing combo, $6–10M revenue, family-owned, 15+ years operating" },
-{ id:"raleigh", name:"Raleigh–Durham", state:"NC", population:"2.2M metro", income:"$78K", homeAge:19,
+{ id:"raleigh", ageVerified:true, demoVerified:true, name:"Raleigh–Durham", state:"NC", population:"2.2M metro", income:"$107K", homeAge:22,
   builderEra:"1998–2015 national-builder growth around Research Triangle Park",
   density:"Medium-High", competitiveDensity:"Medium",
   adjacentIndustry:"Research Triangle tech expansion plus a growing hyperscale data-center cluster (Apple campus, multiple announced facilities).",
   laborDrain:"Medium-High", marginOpp:"High", commercialTilt:35, tradeDiversification:2, consolidation:"Medium",
   score:81, archetype:"Residential/light-commercial HVAC & Electrical combo positioned ahead of the Triangle's data-center labor squeeze" },
-{ id:"columbus", name:"Columbus", state:"OH", population:"2.1M metro", income:"$68K", homeAge:28,
+{ id:"columbus", demoVerified:true, name:"Columbus", state:"OH", population:"2.1M metro", income:"$87K", homeAge:28,
   builderEra:"1990s–2000s suburban tract housing now entering full-system replacement cycle",
   density:"Medium", competitiveDensity:"Medium",
   adjacentIndustry:"Intel's $28B fab plus a fast-growing hyperscale data-center corridor in New Albany/Licking Co. — the largest active buildout in the Midwest.",
@@ -112,7 +112,7 @@ const METROS = [
   marginOpp:"High — techs who stay in service/replacement face reduced competition as peers shift to construction",
   commercialTilt:30, tradeDiversification:2, consolidation:"Medium",
   score:85, archetype:"Single-location residential/light-commercial HVAC leader with succession-planning owner, $8–15M revenue" },
-{ id:"phoenix", name:"Phoenix", state:"AZ", population:"5.0M metro", income:"$74K", homeAge:18,
+{ id:"phoenix", ageVerified:true, demoVerified:true, name:"Phoenix", state:"AZ", population:"5.0M metro", income:"$94K", homeAge:29,
   builderEra:"Rapid 2000s–2020s national-builder growth, still actively building",
   density:"High", competitiveDensity:"High — several national roll-up platforms already active",
   adjacentIndustry:"TSMC's $65B fab plus a major data-center buildout in Chandler/Mesa.",
@@ -127,7 +127,7 @@ const METROS = [
   marginOpp:"High — service techs who remain in residential/light-commercial work are scarce and can price accordingly",
   commercialTilt:45, tradeDiversification:2, consolidation:"Medium",
   score:88, archetype:"Residential/light-commercial HVAC & Electrical combo with a stable retained tech base — retention track record matters more here than size" },
-{ id:"richmond", name:"Richmond", state:"VA", population:"1.3M metro", income:"$70K", homeAge:30,
+{ id:"richmond", demoVerified:true, name:"Richmond", state:"VA", population:"1.3M metro", income:"$84K", homeAge:30,
   builderEra:"Mixed vintage with strong 1990s suburban tract rings",
   density:"Medium", competitiveDensity:"Medium",
   adjacentIndustry:"Growing data-center spillover south from Northern Virginia along the I-95 corridor plus a stable state-government economy.",
@@ -147,21 +147,21 @@ const METROS = [
   laborDrain:"Medium", marginOpp:"Medium-High",
   commercialTilt:30, tradeDiversification:2, consolidation:"High",
   score:76, archetype:"2-location residential/commercial combo serving both tract-housing service calls and light-industrial accounts" },
-{ id:"atlanta", name:"Atlanta", state:"GA", population:"6.3M metro", income:"$71K", homeAge:24,
+{ id:"atlanta", ageVerified:true, demoVerified:true, name:"Atlanta", state:"GA", population:"6.3M metro", income:"$97K", homeAge:28,
   builderEra:"Extensive 1990s–2000s national-builder subdivisions — prime replacement-cycle housing stock",
   density:"High", competitiveDensity:"High",
   adjacentIndustry:"One of the largest data-center markets in the US, concentrated in Douglas, Fulton, and Coweta counties.",
   laborDrain:"High", marginOpp:"Medium",
   commercialTilt:35, tradeDiversification:3, consolidation:"Low — already a target-rich, well-picked-over metro",
   score:80, archetype:"Multi-location full-trade platform; likely a bolt-on acquisition rather than a platform entry at this point" },
-{ id:"pittsburgh", name:"Pittsburgh", state:"PA", population:"2.3M metro", income:"$65K", homeAge:45,
+{ id:"pittsburgh", ageVerified:true, demoVerified:true, name:"Pittsburgh", state:"PA", population:"2.3M metro", income:"$82K", homeAge:64,
   builderEra:"Older, established housing stock — a full-system-replacement market rather than a tune-up market",
   density:"Medium", competitiveDensity:"Medium",
   adjacentIndustry:"Modest AI-compute and data-center investment; a slower-growth market overall.",
   laborDrain:"Low", marginOpp:"Medium",
   commercialTilt:30, tradeDiversification:2, consolidation:"Medium",
   score:66, archetype:"Long-tenured single-location HVAC & Plumbing operator serving an aging housing stock with high replacement-ticket values" },
-{ id:"philadelphia", name:"Philadelphia", state:"PA", population:"6.2M metro", income:"$74K", homeAge:55,
+{ id:"philadelphia", ageVerified:true, demoVerified:true, name:"Philadelphia", state:"PA", population:"6.2M metro", income:"$95K", homeAge:58,
   builderEra:"Old rowhome and streetcar-suburb stock in the core; 1990s–2000s tract rings in Chester, Bucks, and Montgomery counties",
   density:"High", competitiveDensity:"High — Sila's home market with deep existing brand coverage",
   adjacentIndustry:"Eds-and-meds economy plus growing suburban data-center interest along the I-95/PA-Turnpike corridors.",
@@ -176,7 +176,7 @@ const METROS = [
   commercialTilt:20, tradeDiversification:1, consolidation:"Medium",
   incentiveFlag:"High exposure to NH/Mass Save-adjacent electrification incentives — mini-split/ductless share of new installs has grown sharply and is vulnerable to incentive rollback.",
   score:58, archetype:"Illustrates the New England incentive-volatility pattern directly — underwrite as if a meaningful share of current-year revenue is incentive-dependent" },
-{ id:"boston", name:"Boston", state:"MA", population:"4.9M metro", income:"$94K", homeAge:60,
+{ id:"boston", ageVerified:true, demoVerified:true, name:"Boston", state:"MA", population:"4.9M metro", income:"$125K", homeAge:59,
   builderEra:"Very old triple-decker and colonial housing stock — high-ticket retrofit and replacement work",
   density:"High", competitiveDensity:"High",
   adjacentIndustry:"Eds-meds-biotech economy; lab buildout creates commercial mechanical demand.",
@@ -184,7 +184,7 @@ const METROS = [
   commercialTilt:40, tradeDiversification:3, consolidation:"Low — existing Sila stronghold",
   incentiveFlag:"Mass Save is the canonical incentive-cycle example — heat-pump conversion volume swings with program budgets and administration priorities.",
   score:62, archetype:"Densification tuck-ins around the existing Boston Sila position; underwrite Mass Save dependency explicitly" },
-{ id:"hartford", name:"Hartford / New Haven", state:"CT", population:"2.0M combined metro", income:"$76K", homeAge:55,
+{ id:"hartford", ageVerified:true, demoVerified:true, name:"Hartford / New Haven", state:"CT", population:"2.0M combined metro", income:"$98K", homeAge:56,
   builderEra:"Old New England housing stock with pockets of 1980s–90s suburbia",
   density:"Medium-High", competitiveDensity:"Medium",
   adjacentIndustry:"Insurance and defense (Electric Boat, Pratt & Whitney) anchor employment; modest data-center activity.",
@@ -200,7 +200,7 @@ const METROS = [
   commercialTilt:15, tradeDiversification:1, consolidation:"Medium",
   incentiveFlag:"Efficiency Vermont heat-pump incentives mirror the Maine pattern — high ductless share, high policy sensitivity.",
   score:54, archetype:"Small-market tuck-in only; incentive dependency is the dominant underwriting question" },
-{ id:"portlandme", name:"Portland", state:"ME", population:"550K metro", income:"$70K", homeAge:50,
+{ id:"portlandme", demoVerified:true, name:"Portland", state:"ME", population:"550K metro", income:"$80K", homeAge:50,
   builderEra:"Old housing stock with heavy oil-to-heat-pump conversion activity",
   density:"Low-Medium", competitiveDensity:"Low",
   adjacentIndustry:"No significant adjacent industrial buildout.",
@@ -208,7 +208,7 @@ const METROS = [
   commercialTilt:15, tradeDiversification:1, consolidation:"Medium",
   incentiveFlag:"Extremely high exposure to Efficiency Maine heat-pump incentives; ductless mini-split share of the market has surged and would contract sharply if incentives lapse.",
   score:55, archetype:"Second New England volatility example — pair with Manchester, NH when sizing incentive-dependency exposure across a New England add-on strategy" },
-{ id:"northjersey", name:"North / Central NJ", state:"NJ", population:"6.0M+ region", income:"$92K", homeAge:50,
+{ id:"northjersey", demoVerified:true, ageVerified:true, name:"North / Central NJ", state:"NJ", population:"6.0M+ region", income:"$103K (NY metro)", homeAge:63,
   builderEra:"Dense postwar suburbia — huge installed base of aging systems",
   density:"Very High", competitiveDensity:"High",
   adjacentIndustry:"Pharma and logistics anchors plus one of the East Coast's largest data-center concentrations in the Meadowlands/Secaucus area.",
@@ -223,42 +223,42 @@ const METROS = [
   laborDrain:"Medium", marginOpp:"Medium",
   commercialTilt:25, tradeDiversification:2, consolidation:"Medium",
   score:66, archetype:"Bridges existing Westchester and upstate positions; municipal licensing raises incumbency value" },
-{ id:"buffalo", name:"Buffalo", state:"NY", population:"1.1M metro", income:"$62K", homeAge:60,
+{ id:"buffalo", ageVerified:true, demoVerified:true, name:"Buffalo", state:"NY", population:"1.1M metro", income:"$74K", homeAge:66,
   builderEra:"Very old housing stock — high replacement tickets, low new-construction exposure",
   density:"Medium", competitiveDensity:"Low-Medium",
   adjacentIndustry:"Modest; some advanced-manufacturing reshoring.",
   laborDrain:"Low", marginOpp:"Medium",
   commercialTilt:25, tradeDiversification:2, consolidation:"Medium",
   score:61, archetype:"Densification around the existing T-Mark position in Western New York" },
-{ id:"wilmington", name:"Wilmington", state:"DE", population:"590K metro", income:"$75K", homeAge:40,
+{ id:"wilmington", ageVerified:true, name:"Wilmington", state:"DE", population:"590K metro", income:"$75K", homeAge:58,
   builderEra:"Postwar suburbia plus 1990s–2000s New Castle County growth",
   density:"Medium", competitiveDensity:"Low-Medium",
   adjacentIndustry:"Banking/legal economy; adjacent to Philadelphia market dynamics.",
   laborDrain:"Low", marginOpp:"Medium",
   commercialTilt:30, tradeDiversification:2, consolidation:"Medium",
   score:63, archetype:"Effectively part of the greater Philadelphia densification strategy" },
-{ id:"baltimore", name:"Baltimore", state:"MD", population:"2.8M metro", income:"$77K", homeAge:45,
+{ id:"baltimore", demoVerified:true, name:"Baltimore", state:"MD", population:"2.8M metro", income:"$103K", homeAge:45,
   builderEra:"Old rowhome core with extensive 1980s–2000s suburban counties",
   density:"High", competitiveDensity:"Medium-High",
   adjacentIndustry:"Port/logistics plus federal-agency employment; data-center growth pushing up from NoVA into Frederick County.",
   laborDrain:"Medium", marginOpp:"Medium",
   commercialTilt:30, tradeDiversification:2, consolidation:"Medium",
   score:68, archetype:"Bridges the existing MD position and the NoVA labor-squeeze opportunity" },
-{ id:"chicago", name:"Chicago", state:"IL", population:"9.4M metro", income:"$75K", homeAge:50,
+{ id:"chicago", ageVerified:true, demoVerified:true, name:"Chicago", state:"IL", population:"9.4M metro", income:"$94K", homeAge:52,
   builderEra:"Vast bungalow-belt and postwar suburban stock — enormous installed base",
   density:"Very High", competitiveDensity:"High",
   adjacentIndustry:"Diversified economy with a growing western-suburbs data-center cluster (Elk Grove Village is one of the largest US markets).",
   laborDrain:"Medium", marginOpp:"Medium",
   commercialTilt:35, tradeDiversification:3, consolidation:"Medium",
   score:70, archetype:"Densification around the Ahrens & Condill / Tangney positions; Chicago municipal licensing strongly protects incumbents" },
-{ id:"milwaukee", name:"Milwaukee", state:"WI", population:"1.6M metro", income:"$66K", homeAge:45,
+{ id:"milwaukee", ageVerified:true, demoVerified:true, name:"Milwaukee", state:"WI", population:"1.6M metro", income:"$80K", homeAge:56,
   builderEra:"Older urban core with 1990s suburban rings (New Berlin corridor)",
   density:"Medium", competitiveDensity:"Medium",
   adjacentIndustry:"Microsoft's major Mount Pleasant data-center campus (on the former Foxconn site) is a significant new labor-demand signal.",
   laborDrain:"Medium-High", marginOpp:"Medium-High",
   commercialTilt:30, tradeDiversification:2, consolidation:"Medium",
   score:72, archetype:"Densification around the New Berlin position as the Mount Pleasant buildout tightens trades labor" },
-{ id:"detroit", name:"Detroit", state:"MI", population:"4.3M metro", income:"$65K", homeAge:50,
+{ id:"detroit", ageVerified:true, demoVerified:true, name:"Detroit", state:"MI", population:"4.3M metro", income:"$79K", homeAge:56,
   builderEra:"Vast postwar suburban stock — large installed replacement base",
   density:"High", competitiveDensity:"Medium-High",
   adjacentIndustry:"Auto/EV plant retooling plus emerging data-center interest.",
@@ -272,42 +272,42 @@ const METROS = [
   laborDrain:"Low-Medium", marginOpp:"Medium-High",
   commercialTilt:25, tradeDiversification:2, consolidation:"High",
   score:72, archetype:"West Michigan platform target in a fragmented, growing market — a fresh position rather than a Detroit tuck-in" },
-{ id:"indianapolis", name:"Indianapolis", state:"IN", population:"2.1M metro", income:"$66K", homeAge:26,
+{ id:"indianapolis", demoVerified:true, name:"Indianapolis", state:"IN", population:"2.1M metro", income:"$82K", homeAge:26,
   builderEra:"1990s–2000s tract housing ringing the metro",
   density:"Medium", competitiveDensity:"Medium",
   adjacentIndustry:"Emerging data-center corridor (Google, AWS announcements) plus a large logistics-hub economy.",
   laborDrain:"Medium", marginOpp:"Medium-High",
   commercialTilt:30, tradeDiversification:2, consolidation:"Medium",
   score:75, archetype:"2-location residential/commercial combo well-positioned ahead of the data-center buildout maturing" },
-{ id:"nashville", name:"Nashville", state:"TN", population:"2.1M metro", income:"$70K", homeAge:20,
+{ id:"nashville", ageVerified:true, demoVerified:true, name:"Nashville", state:"TN", population:"2.1M metro", income:"$92K", homeAge:28,
   builderEra:"Explosive 2000s–2020s national-builder growth",
   density:"Medium-High", competitiveDensity:"Medium-High",
   adjacentIndustry:"Corporate relocations (Oracle campus) plus data-center growth in the surrounding counties.",
   laborDrain:"Medium-High", marginOpp:"Medium",
   commercialTilt:30, tradeDiversification:2, consolidation:"Medium",
   score:79, archetype:"Contiguous-expansion platform entry — TN borders both VA and GA positions, no state HVAC income tax friction, strong in-migration" },
-{ id:"louisville", name:"Louisville", state:"KY", population:"1.3M metro", income:"$62K", homeAge:35,
+{ id:"louisville", demoVerified:true, name:"Louisville", state:"KY", population:"1.3M metro", income:"$77K", homeAge:35,
   builderEra:"Mixed vintage with steady 1990s suburban rings",
   density:"Medium", competitiveDensity:"Low-Medium",
   adjacentIndustry:"UPS Worldport logistics anchor plus Ford EV investment in the region.",
   laborDrain:"Medium", marginOpp:"Medium",
   commercialTilt:30, tradeDiversification:2, consolidation:"High",
   score:69, archetype:"Contiguous expansion off the Ohio position; fragmented market with room for a platform" },
-{ id:"minneapolis", name:"Minneapolis–St. Paul", state:"MN", population:"3.7M metro", income:"$80K", homeAge:40,
+{ id:"minneapolis", demoVerified:true, name:"Minneapolis–St. Paul", state:"MN", population:"3.7M metro", income:"$101K", homeAge:40,
   builderEra:"Large postwar and 1980s–90s suburban stock; harsh-climate replacement economics",
   density:"Medium-High", competitiveDensity:"Medium-High",
   adjacentIndustry:"Corporate HQ economy (Target, UnitedHealth) plus Meta's Rosemount data-center build.",
   laborDrain:"Medium", marginOpp:"Medium",
   commercialTilt:30, tradeDiversification:2, consolidation:"Medium",
   score:73, archetype:"Contiguous expansion off Wisconsin; heating-dominant revenue rhythm similar to existing northern markets" },
-{ id:"kansascity", name:"Kansas City", state:"MO", population:"2.2M metro", income:"$68K", homeAge:30,
+{ id:"kansascity", demoVerified:true, name:"Kansas City", state:"MO", population:"2.2M metro", income:"$88K", homeAge:30,
   builderEra:"1990s–2000s suburban tract rings on both state sides",
   density:"Medium", competitiveDensity:"Medium",
   adjacentIndustry:"Meta and Google data-center builds plus a Panasonic battery plant in De Soto, KS.",
   laborDrain:"Medium-High", marginOpp:"Medium-High",
   commercialTilt:30, tradeDiversification:2, consolidation:"Medium",
   score:70, archetype:"Two-state metro — KC municipal licensing on the MO side adds incumbent protection; labor squeeze from battery/data-center builds" },
-{ id:"denver", name:"Denver", state:"CO", population:"3.0M metro", income:"$85K", homeAge:28,
+{ id:"denver", ageVerified:true, demoVerified:true, name:"Denver", state:"CO", population:"3.0M metro", income:"$112K", homeAge:35,
   builderEra:"1990s–2010s Front Range tract growth",
   density:"Medium-High", competitiveDensity:"High — active roll-up territory",
   adjacentIndustry:"Aerospace and tech anchors; moderate data-center activity.",
@@ -315,21 +315,21 @@ const METROS = [
   commercialTilt:30, tradeDiversification:2, consolidation:"Low-Medium",
   incentiveFlag:"Colorado heat-pump tax credits and Xcel rebates are material to current conversion volume — moderate volatility exposure.",
   score:72, archetype:"New-territory platform entry in a competitive roll-up market; would be an isolated regional position" },
-{ id:"tampa", name:"Tampa", state:"FL", population:"3.3M metro", income:"$67K", homeAge:25,
+{ id:"tampa", demoVerified:true, name:"Tampa", state:"FL", population:"3.3M metro", income:"$83K", homeAge:25,
   builderEra:"Waves of 1980s–2020s national-builder growth; cooling-dominant replacement cycle",
   density:"Medium-High", competitiveDensity:"High — heavy PE roll-up activity statewide",
   adjacentIndustry:"Population in-migration is the demand story more than any single industry.",
   laborDrain:"Low-Medium", marginOpp:"Medium",
   commercialTilt:30, tradeDiversification:2, consolidation:"Low — Florida is the most picked-over HVAC M&A market in the country",
   score:77, archetype:"Contiguous expansion off Georgia; strong fundamentals but expect competitive processes and premium multiples" },
-{ id:"sanantonio", name:"San Antonio", state:"TX", population:"2.7M metro", income:"$63K", homeAge:22,
+{ id:"sanantonio", ageVerified:true, demoVerified:true, name:"San Antonio", state:"TX", population:"2.7M metro", income:"$82K", homeAge:28,
   builderEra:"Fast-growing national-builder subdivisions",
   density:"Medium-High", competitiveDensity:"Medium — low regulatory barrier means a more fragmented small-operator landscape",
   adjacentIndustry:"Significant hyperscale data-center investment (Microsoft, Google) plus a large military/aerospace base economy.",
   laborDrain:"Medium-High", marginOpp:"Medium",
   commercialTilt:30, tradeDiversification:2, consolidation:"High",
   score:69, archetype:"Good metro fundamentals despite Texas's statewide Caution flag — illustrates why state-level and metro-level signals can diverge" },
-{ id:"dallas", name:"Dallas–Fort Worth", state:"TX", population:"8.1M metro", income:"$75K", homeAge:22,
+{ id:"dallas", ageVerified:true, demoVerified:true, name:"Dallas–Fort Worth", state:"TX", population:"8.1M metro", income:"$98K", homeAge:28,
   builderEra:"Enormous 1990s–2020s national-builder inventory",
   density:"High", competitiveDensity:"Very High — every national platform is here",
   adjacentIndustry:"Major corporate-relocation and data-center market with continuous buildout.",
@@ -663,12 +663,36 @@ const RESEARCH_WORKER_URL = "https://sila-ma-research.edwardbmcfarlane.workers.d
 // data-live.json to GitHub, and Pages redeploys it.
 const DATA_DOMAINS = [
   { key:"licensing", label:"State licensing & moat", source:"State licensing boards (web-verified)", status:"50 of 50 verified (29 deep-dive, 21 comparative)", updated:"Aug 2026" },
-  { key:"incentives", label:"Incentive exposure ratings", source:"Sample — directional", status:"Sample", updated:"Aug 2026" },
-  { key:"metros", label:"Metro demographics (34 metros)", source:"Sample — Census/ACS planned", status:"Sample", updated:"Aug 2026" },
+  { key:"incentives", label:"Incentive exposure & programs", source:"Federal (OBBBA/IRS) + state program administrators", status:"Verified — federal + 9 key states", updated:"Aug 2026" },
+  { key:"metros", label:"Metro demographics (34 metros)", source:"Income: ACS/Atlanta Fed (Mar 2026); Home age: ACS 2024 via Construction Coverage; competitive density & builder-era narratives remain sample", status:"Income 26/34 + home age 18/34 verified", updated:"Aug 2026" },
   { key:"anchors", label:"Sila footprint anchors (distance calc)", source:"19 representative anchors — full 45-brand directory planned", status:"Representative", updated:"Aug 2026" },
-  { key:"distributors", label:"Distributor coverage", source:"Modeled from public branch networks", status:"Sample", updated:"Aug 2026" },
+  { key:"distributors", label:"Distributor coverage", source:"National networks + F.W. Webb footprint verified from company sources; other regional mappings modeled", status:"Partially verified", updated:"Aug 2026" },
   { key:"schools", label:"Trade-school pipeline", source:"Directional counts + flagship programs", status:"Sample", updated:"Aug 2026" }
 ];
+
+
+// ============================================================
+// INCENTIVE LAYER — VERIFIED Aug 2026
+// ============================================================
+const FEDERAL_INCENTIVE_CONTEXT = {
+  headline: "Federal heat-pump tax credits are GONE — the incentive-volatility thesis already happened",
+  body: "The One Big Beautiful Bill Act (P.L. 119-21, signed July 4, 2025) terminated the Section 25C credit (up to $2,000/heat pump) and Section 25D (30% geothermal/solar) for anything placed in service after Dec 31, 2025 — pulled forward from 2032, with no grandfathering for equipment bought earlier but installed later. The IRA's HEAR/HOMES rebates (up to $8K–$14K, income-qualified) survived because funds were already granted to states — but they are depleting state by state: California exhausted its allocation in Feb 2026 less than three months after launch, Colorado closed its single-family program in 2026, and new DOE guidance effective Aug 2026 blocks HEAR funds from fossil-to-electric replacements. Offsetting signal: a $450M five-state New England Heat Pump Accelerator (ME, VT, NH, MA, RI) launched Feb 2026. Net effect for underwriting: 2024–2025 heat-pump revenue everywhere carried a federal subsidy that no longer exists, and any target's trailing twelve months should be restated without it.",
+  verifiedDate: "Aug 2026"
+};
+
+// State-level incentive notes — verified against program administrators Aug 2026
+const INCENTIVE_NOTES = {
+ME: "Efficiency Maine remains among the most generous programs in the country — $1,000–$9,000 per system by income tier plus a $500 whole-home bonus through Dec 2026 — and is funded by RGGI and utility surcharges, so it is structurally insulated from federal cuts. But rebates now require whole-home, single-zone primary-heat systems (multi-zone and dual-fuel are NOT rebatable), which reshapes what sells. Plus the $450M NE Heat Pump Accelerator adds regional fuel from Feb 2026.",
+MA: "Mass Save heat-pump rebates continue (whole-home/partial-home structure, capped at $8,500 per account) and are utility-surcharge funded — but the program renegotiates on three-year cycles, and the federal 25C layer that stacked on top is gone, effectively raising customer out-of-pocket by ~$2,000 per job versus 2025.",
+NH: "Weakest incentive position in New England going forward for the opposite reason: NH's HEAR program had not even launched as of mid-2026 (contractor approved Mar 2026; launch expected Fall 2026), so there is little state cushion replacing the lost federal credits.",
+VT: "Vermont is routing most of its HEAR allocation to low-income weatherization and affordable multifamily rather than market-rate heat-pump rebates — so the market-rate segment absorbs the federal credit loss with less state offset than Maine provides.",
+CT: "Energize CT programs continue on utility funding; same structural pattern as Mass Save — state layer intact, federal layer gone.",
+NY: "NYSERDA NYS Clean Heat continues and HEAR is active in NY — one of the better-cushioned states post-OBBBA.",
+CO: "Realized volatility case: Colorado's HEAR single-family program is fully closed (Front Range funds reserved Apr 2026, remaining counties closed Aug 2026) after demand consumed a four-year budget in under ten months. Xcel and state rebates continue at lower levels.",
+CA: "Realized volatility case: California's HEEHRA/HEAR allocation was exhausted Feb 24, 2026 — under three months after full launch. TECH Clean California and utility programs continue, but the stack shrank dramatically.",
+MT: "HEAR planning paused pending updated DOE guidance — no state program cushion."
+};
+STATE_ROWS.forEach(s => { if (INCENTIVE_NOTES[s.abbr]) { s.incentiveNote = INCENTIVE_NOTES[s.abbr]; s.incentiveVerified = true; } });
 
 // ---- Current Sila operating footprint (16 states) ----
 const OPERATING_STATES = ["CT","DE","GA","IL","MA","MD","ME","MI","NH","NJ","NY","OH","PA","VA","VT","WI"];
@@ -757,11 +781,11 @@ sanantonio:[29.42,-98.49], dallas:[32.78,-96.80]
 // ============================================================
 
 // National distributors present in effectively every state
-const NATIONAL_DISTRIBUTORS = ["Ferguson", "Winsupply", "Johnstone Supply", "Hajoca (plumbing)"];
+const NATIONAL_DISTRIBUTORS = ["Ferguson", "Winsupply (680+ local companies)", "Johnstone Supply (400+ stores)", "Hajoca (plumbing)"];
 
 // Regional distributors → the states where they have meaningful branch density
 const REGIONAL_DISTRIBUTORS = {
-"F.W. Webb": ["CT","MA","ME","NH","NJ","NY","PA","RI","VT"],
+"F.W. Webb (100+ branches — largest NE distributor, VERIFIED)": ["CT","MA","ME","NH","NJ","NY","PA","RI","VT"],
 "R.E. Michel": ["AL","CT","DE","FL","GA","IL","IN","KY","MA","MD","MS","NC","NJ","NY","OH","PA","SC","TN","VA","WV"],
 "Watsco (Gemaire / Baker)": ["AL","AZ","CA","FL","GA","LA","MS","NC","NV","SC","TN","TX","VA"],
 "APR Supply": ["PA"],
@@ -1116,6 +1140,11 @@ function StateDetail({ s, goToMetros }) {
         </div>
       </div>
       <div className="expand-body">{s.note}</div>
+      {s.incentiveNote && (
+        <div className="flag" style={{marginTop:12}}>
+          ⚡ <strong>Incentive program status (verified Aug 2026):</strong> {s.incentiveNote}
+        </div>
+      )}
       <div className="grid2" style={{marginTop:12}}>
         <div>
           <div className="note-label">Distributor Coverage (sample)</div>
@@ -1162,6 +1191,13 @@ function StatesTab({ goToMetros }) {
       <div className="toggle-row" style={{marginBottom:10}}>
         <button className={"pill-btn" + (mapMode==="rating" ? " active":"")} onClick={()=>setMapMode("rating")}>Color by M&A Rating</button>
         <button className={"pill-btn" + (mapMode==="footprint" ? " active":"")} onClick={()=>setMapMode("footprint")}>Color by Footprint & Contiguity</button>
+      </div>
+      <div className="card" style={{borderColor:"rgba(232,196,104,0.4)"}}>
+        <div style={{display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:10, flexWrap:"wrap"}}>
+          <div className="method-title" style={{fontSize:16}}>⚡ {FEDERAL_INCENTIVE_CONTEXT.headline}</div>
+          <span className="ver-badge" style={{marginLeft:0}}>✓ VERIFIED {FEDERAL_INCENTIVE_CONTEXT.verifiedDate}</span>
+        </div>
+        <div className="note-line">{FEDERAL_INCENTIVE_CONTEXT.body}</div>
       </div>
       <USTileMap mode={mapMode} selected={openState} onSelect={(abbr) => setOpenState(openState === abbr ? null : abbr)} />
       {openState && byAbbr[openState] && (
@@ -1259,7 +1295,7 @@ function MetrosTab({ stateFilter, clearStateFilter }) {
           <div className="metro-head" onClick={() => setOpenId(openId===m.id ? null : m.id)} style={{cursor:"pointer"}}>
             <div>
               <div className="metro-name">{m.name}</div>
-              <div className="metro-state">{m.state} · {m.population} · Median income {m.income}</div>
+              <div className="metro-state">{m.state} · {m.population} · Median income {m.income}{m.demoVerified && <span className="ver-badge" style={{fontSize:9, padding:"2px 6px"}}>✓ ACS</span>}</div>
               <div style={{marginTop:6, display:"flex", gap:8, flexWrap:"wrap", alignItems:"center"}}>
                 <span className={"terr-chip terr-" + cls}>
                   {cls === "operating" ? "IN CURRENT FOOTPRINT" : cls === "adjacent" ? "CONTIGUOUS EXPANSION" : "NEW TERRITORY"}
@@ -1272,7 +1308,7 @@ function MetrosTab({ stateFilter, clearStateFilter }) {
           {openId === m.id && (
             <div className="expand-body">
               <div className="stat-row">
-                <div className="stat"><div className="k">Median Home Age</div><div className="v">{m.homeAge} yrs</div></div>
+                <div className="stat"><div className="k">Median Home Age{m.ageVerified && " ✓"}</div><div className="v">{m.homeAge} yrs</div></div>
                 <div className="stat"><div className="k">Density</div><div className="v">{m.density}</div></div>
                 <div className="stat"><div className="k">Competitive Density</div><div className="v">{m.competitiveDensity}</div></div>
                 <div className="stat"><div className="k">Labor Drain Risk</div><div className="v">{m.laborDrain.split(" —")[0]}</div></div>

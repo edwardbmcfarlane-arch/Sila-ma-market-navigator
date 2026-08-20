@@ -347,7 +347,7 @@ const VERIFIED_STATES = {
 GA: {
   licensing: "Statewide — Conditioned Air Contractor license (Construction Industry Licensing Board), Class I restricted / Class II unrestricted",
   moat: 4, rating: "Favorable",
-  note: "VERIFIED with a moat upgrade: Georgia has required Conditioned Air Contractor licensing statewide since 1949 — Class I (restricted, ≤175K BTU heating / 60K BTU cooling) needs 4 years of W-2 documented experience under a licensed contractor (no 1099/sub work counts) plus board-approved design coursework; Class II (unrestricted) needs 5 years including large-system installs. Three notarized professional references required. Reported reciprocity with LA, SC, and TX — though SC-side sources conflict, so verify per board before relying on it. A stronger moat than sample data assumed, in Sila's southern anchor state.",
+  note: "VERIFIED with a moat upgrade: Georgia has required Conditioned Air Contractor licensing statewide since 1949 — Class I (restricted, ≤175K BTU heating / 60K BTU cooling) needs 4 years of W-2 documented experience under a licensed contractor (no 1099/sub work counts) plus board-approved design coursework; Class II (unrestricted) needs 5 years including large-system installs. Three notarized professional references required. Reported reciprocity with LA, SC, and TX — though SC-side sources conflict, so verify per board before relying on it. A stronger moat than sample data assumed. CORRECTION: Georgia is NOT a current Sila state — the platform's own materials describe its footprint as Northeast, Mid-Atlantic, and Midwest, and no Sila brand operates in GA. Atlanta-area entry would be a new-territory move (non-contiguous: nearest Sila state is Virginia, with NC between), albeit into a strong-moat, strong-demographics market.",
   authority: "GA State Construction Industry Licensing Board / Div. of Conditioned Air Contractors", verifiedDate: "Aug 2026"
 },
 DE: {
@@ -717,8 +717,8 @@ const TARGETS = [
   { name: "EXAMPLE — Tidewater Mechanical", metro: "Richmond, VA", trades: "HVAC", revBand: "~$6M (D&B modeled estimate — unverified)", employees: "~40 (D&B estimate)", founded: "1998 (VA DPOR Class A since 2001)", ownership: "Founder-led; no succession signals found", reviews: "4.6★ · ~310 Google reviews", flags: "Not yet screened", confidence: "Medium", status: "Example row — replace", sources: "dnb.com profile; company site; VA DPOR lookup" }
 ];
 
-// ---- Current Sila operating footprint (16 states) ----
-const OPERATING_STATES = ["CT","DE","GA","IL","MA","MD","ME","MI","NH","NJ","NY","OH","PA","VA","VT","WI"];
+// ---- Current Sila operating footprint (15 states) ----
+const OPERATING_STATES = ["CT","DE","IL","MA","MD","ME","MI","NH","NJ","NY","OH","PA","VA","VT","WI"]; // 15 states — verified against silaservices.com Aug 2026 (GA removed: no Sila brand operates there)
 
 // ---- US state land adjacency (for contiguous-expansion analysis) ----
 const NEIGHBORS = {
@@ -1157,7 +1157,7 @@ function USTileMap({ mode, selected, onSelect }) {
       <div className="map-legend">
         {mode === "footprint" ? (
           <React.Fragment>
-            <span className="leg-item"><span className="leg-swatch" style={{background:FOOTPRINT_COLORS.operating}}></span> Current footprint (16 states)</span>
+            <span className="leg-item"><span className="leg-swatch" style={{background:FOOTPRINT_COLORS.operating}}></span> Current footprint (15 states)</span>
             <span className="leg-item"><span className="leg-swatch" style={{background:FOOTPRINT_COLORS.adjacent}}></span> Adjacent — contiguous expansion</span>
             <span className="leg-item"><span className="leg-swatch" style={{background:FOOTPRINT_COLORS.new, border:"1px solid rgba(255,255,255,0.2)"}}></span> New territory</span>
             <span className="leg-item"><span style={{color:"#7EDB9C", fontWeight:700}}>✓</span> = licensing verified · <span style={{color:"#8FA6BC"}}>•</span> = sample data</span>

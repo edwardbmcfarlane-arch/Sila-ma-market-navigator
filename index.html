@@ -707,12 +707,14 @@ const TARGET_SOURCE_STACK = [
   { name: "Company websites", cost: "Free", quality: "Trades, footprint, ownership signals", detail: "Service pages confirm trade mix; 'since 19XX' and founder-story pages signal generation and succession posture; careers pages and fleet photos signal headcount; multiple location pages signal multi-branch operations." },
   { name: "D&B public profiles", cost: "Free (basic) / subscription (full)", quality: "Modeled estimates — label as such", detail: "dnb.com exposes modeled revenue and employee estimates for most private companies. Useful for triage and cross-reference, but figures are algorithmic estimates — never treat them as verified. A D&B Hoovers subscription (or Grata / SourceScrub, which are purpose-built for private-company M&A sourcing) upgrades this layer if deal flow justifies it." },
   { name: "Permit databases", cost: "Free–low", quality: "Install-volume proxy", detail: "BuildZoom, Shovels.ai, and municipal permit portals show permits pulled by contractor — the closest public proxy for actual install volume and commercial/residential mix." },
+  { name: "Google review scores", cost: "Free", quality: "Volume + service-quality proxy", detail: "Review COUNT is the best free proxy for residential call volume — a 4.7-star shop with 2,000 reviews runs far more volume than a 5.0 with 40. Rating trend and complaint patterns (billing disputes, unfinished work, warranty refusal) signal operational quality. The scout agent now captures rating + count for every candidate." },
+  { name: "Public legal & regulatory records", cost: "Free", quality: "Deal-killer early warning", detail: "License-board disciplinary actions, state AG consumer-protection cases, OSHA citations, BBB complaint patterns, and lawsuit coverage are all public. The Legal & Reputation Screen in Data & Research checks these per company — labeling findings as adjudicated, alleged, or reputation signal. Ordinary contractor litigation is normal; patterns and severity are what matter." },
   { name: "Industry rankings & local press", cost: "Free", quality: "Growth + succession signals", detail: "ACHR News rankings, Inc. 5000 appearances, 'fastest growing companies' lists, anniversary stories, and expansion articles surface both growth targets and owners talking publicly about the future of their business." }
 ];
 
 const TARGETS = [
-  { name: "EXAMPLE — Buckeye Comfort Co.", metro: "Columbus, OH", trades: "HVAC + Plumbing", revBand: "$12–15M (Business Journal 2025 list: $13.4M)", employees: "~85 (BJ list)", founded: "1987 (OH eLicense: licensed 1989)", ownership: "2nd-generation family; founder semi-retired per website bio", confidence: "High", status: "Example row — replace", sources: "Columbus Business First Book of Lists 2025; company site; OH eLicense" },
-  { name: "EXAMPLE — Tidewater Mechanical", metro: "Richmond, VA", trades: "HVAC", revBand: "~$6M (D&B modeled estimate — unverified)", employees: "~40 (D&B estimate)", founded: "1998 (VA DPOR Class A since 2001)", ownership: "Founder-led; no succession signals found", confidence: "Medium", status: "Example row — replace", sources: "dnb.com profile; company site; VA DPOR lookup" }
+  { name: "EXAMPLE — Buckeye Comfort Co.", metro: "Columbus, OH", trades: "HVAC + Plumbing", revBand: "$12–15M (Business Journal 2025 list: $13.4M)", employees: "~85 (BJ list)", founded: "1987 (OH eLicense: licensed 1989)", ownership: "2nd-generation family; founder semi-retired per website bio", reviews: "4.8★ · ~1,900 Google reviews", flags: "Screen run — no adverse findings in public records (preliminary only)", confidence: "High", status: "Example row — replace", sources: "Columbus Business First Book of Lists 2025; company site; OH eLicense" },
+  { name: "EXAMPLE — Tidewater Mechanical", metro: "Richmond, VA", trades: "HVAC", revBand: "~$6M (D&B modeled estimate — unverified)", employees: "~40 (D&B estimate)", founded: "1998 (VA DPOR Class A since 2001)", ownership: "Founder-led; no succession signals found", reviews: "4.6★ · ~310 Google reviews", flags: "Not yet screened", confidence: "Medium", status: "Example row — replace", sources: "dnb.com profile; company site; VA DPOR lookup" }
 ];
 
 // ---- Current Sila operating footprint (16 states) ----
@@ -1609,8 +1611,8 @@ function mdToHtml(md) {
 function TargetsTab() {
   const confColor = c => c === "High" ? "#7EDB9C" : c === "Medium" ? "#E8C468" : "#E88968";
   const printTargets = () => {
-    const rows = TARGETS.map(t => `<tr><td><strong>${t.name}</strong></td><td>${t.metro}</td><td>${t.trades}</td><td>${t.revBand}</td><td>${t.employees}</td><td>${t.founded}</td><td>${t.ownership}</td><td>${t.confidence}</td><td>${t.sources}</td></tr>`).join("");
-    openPrint("Target Pipeline", `<table><thead><tr><th>Company</th><th>Metro</th><th>Trades</th><th>Revenue (sourced)</th><th>Employees</th><th>Founded</th><th>Ownership</th><th>Confidence</th><th>Sources</th></tr></thead><tbody>${rows}</tbody></table><p style="margin-top:12px">All revenue and employee figures carry their source; estimates are labeled as estimates. Leads for human review — not vetted targets.</p>`);
+    const rows = TARGETS.map(t => `<tr><td><strong>${t.name}</strong></td><td>${t.metro}</td><td>${t.trades}</td><td>${t.revBand}</td><td>${t.employees}</td><td>${t.founded}</td><td>${t.ownership}</td><td>${t.reviews || "—"}</td><td>${t.flags || "Not screened"}</td><td>${t.confidence}</td><td>${t.sources}</td></tr>`).join("");
+    openPrint("Target Pipeline", `<table><thead><tr><th>Company</th><th>Metro</th><th>Trades</th><th>Revenue (sourced)</th><th>Employees</th><th>Founded</th><th>Ownership</th><th>Reviews</th><th>Flags</th><th>Confidence</th><th>Sources</th></tr></thead><tbody>${rows}</tbody></table><p style="margin-top:12px">All revenue and employee figures carry their source; estimates are labeled as estimates. Leads for human review — not vetted targets.</p>`);
   };
   return (
     <div>
@@ -1650,6 +1652,8 @@ function TargetsTab() {
             <div className="stat"><div className="k">Employees</div><div className="v" style={{fontSize:13}}>{t.employees}</div></div>
             <div className="stat"><div className="k">Founded</div><div className="v" style={{fontSize:13}}>{t.founded}</div></div>
             <div className="stat"><div className="k">Ownership signals</div><div className="v" style={{fontSize:13}}>{t.ownership}</div></div>
+            <div className="stat"><div className="k">Google Reviews (volume proxy)</div><div className="v" style={{fontSize:13}}>{t.reviews || "—"}</div></div>
+            <div className="stat"><div className="k">Legal / reputation flags</div><div className="v" style={{fontSize:13}}>{t.flags || "Not yet screened"}</div></div>
           </div>
           <div className="note-line" style={{marginTop:8}}><strong>Sources:</strong> {t.sources} · <strong>Status:</strong> {t.status}</div>
         </div>
@@ -1664,6 +1668,8 @@ function DataTab() {
   const [stateSel, setStateSel] = useState("PA");
   const [scoutMetro, setScoutMetro] = useState(METROS[0].id);
   const [scoutProfile, setScoutProfile] = useState("Residential-heavy HVAC & Plumbing combo, $5M–$15M revenue, family-owned, 10+ years operating");
+  const [legalCompany, setLegalCompany] = useState("");
+  const [legalState, setLegalState] = useState("PA");
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState(null);
   const [err, setErr] = useState(null);
@@ -1674,7 +1680,9 @@ function DataTab() {
     try {
       const payload = task === "refresh"
         ? { task: "refresh-state", state: stateSel }
-        : { task: "scout-targets", metro: METROS.find(m => m.id === scoutMetro), profile: scoutProfile };
+        : task === "scout"
+        ? { task: "scout-targets", metro: METROS.find(m => m.id === scoutMetro), profile: scoutProfile }
+        : { task: "legal-screen", company: legalCompany, state: legalState, metro: null };
       const r = await fetch(RESEARCH_WORKER_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1722,6 +1730,7 @@ function DataTab() {
             <div className="toggle-row">
               <button className={"pill-btn" + (task==="refresh" ? " active":"")} onClick={()=>setTask("refresh")}>🔄 Refresh a State's Data</button>
               <button className={"pill-btn" + (task==="scout" ? " active":"")} onClick={()=>setTask("scout")}>🔎 Scout Targets in a Metro</button>
+              <button className={"pill-btn" + (task==="legal" ? " active":"")} onClick={()=>setTask("legal")}>⚖ Legal & Reputation Screen</button>
             </div>
             {task === "refresh" ? (
               <div style={{maxWidth:340}}>
@@ -1729,16 +1738,26 @@ function DataTab() {
                   {STATE_ROWS.map(s => <option key={s.abbr} value={s.abbr}>{s.name}{s.verified ? " (verified " + s.verifiedDate + ")" : " (sample)"}</option>)}
                 </select>
               </div>
-            ) : (
+            ) : task === "scout" ? (
               <div className="grid2">
                 <select value={scoutMetro} onChange={e=>setScoutMetro(e.target.value)}>
                   {METROS.map(m => <option key={m.id} value={m.id}>{m.name}, {m.state}</option>)}
                 </select>
                 <input type="text" value={scoutProfile} onChange={e=>setScoutProfile(e.target.value)} placeholder="Target profile description…" />
               </div>
+            ) : (
+              <div>
+                <div className="grid2">
+                  <input type="text" value={legalCompany} onChange={e=>setLegalCompany(e.target.value)} placeholder="Company name — e.g., Favret Heating & Cooling" />
+                  <select value={legalState} onChange={e=>setLegalState(e.target.value)}>
+                    {STATE_ROWS.map(s => <option key={s.abbr} value={s.abbr}>{s.name}</option>)}
+                  </select>
+                </div>
+                <div className="note-line" style={{marginTop:8}}>Checks public records only: license-board discipline, lawsuit &amp; court mentions, AG/FTC actions, OSHA citations, BBB complaint patterns, and Google review patterns — with every finding labeled adjudicated vs. alleged vs. reputation signal. A preliminary screen to prioritize attention, not legal due diligence.</div>
+              </div>
             )}
             <div style={{marginTop:14}}>
-              <button className="print-btn" disabled={busy} onClick={runResearch}>{busy ? "Researching… (30–90 seconds)" : "▶ Run Research"}</button>
+              <button className="print-btn" disabled={busy || (task==="legal" && !legalCompany.trim())} onClick={runResearch}>{busy ? "Researching… (30–90 seconds)" : task==="legal" ? "▶ Run Screen" : "▶ Run Research"}</button>
             </div>
             {err && <div className="flag" style={{marginTop:12}}>⚠ {err}</div>}
             {result && <div className="research-output" dangerouslySetInnerHTML={{__html: mdToHtml(result)}} />}
